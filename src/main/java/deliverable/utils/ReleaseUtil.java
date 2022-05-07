@@ -10,7 +10,7 @@ public class ReleaseUtil {
 	public static Release getReleaseByName(String releaseName, ArrayList<Release> releasesList) {
 		
 		for(Release rel : releasesList) {
-			if(rel.getName() == releaseName) {
+			if(rel.getName().equals(releaseName)) {
 				return rel;
 			}
 			
