@@ -18,6 +18,7 @@ import deliverable.model.Ticket;
 import deliverable.utils.JSONUtil;
 import deliverable.utils.ReleaseUtil;
 
+
 public class RetrieveJiraInfo {
 	
 	private String projKey;
@@ -74,25 +75,30 @@ public class RetrieveJiraInfo {
 		
         for (; i < total && i < j; i++) {
         	//Iterate through each issue
-            String key = (issues.getJSONObject(i%1000).get("key").toString()) + ":";
-            String resolutionDateStr = issues.getJSONObject(i%1000).get("resolutiondate").toString();
-            String creationDateStr = issues.getJSONObject(i%1000).get("created").toString();            
-            JSONArray listAV = issues.getJSONObject(i%1000).getJSONArray("versions");
+        	try {
+        		String key = (issues.getJSONObject(i%1000).get("key").toString()) + ":";
+        		String resolutionDateStr = issues.getJSONObject(i%1000).get("resolutiondate").toString();
+        		String creationDateStr = issues.getJSONObject(i%1000).get("created").toString();            
+        		JSONArray listAV = issues.getJSONObject(i%1000).getJSONArray("versions");
+        		
+        		Date resolutionDate = formatter.parse(resolutionDateStr);
+        		Date creationDate = formatter.parse(creationDateStr);
+        		ArrayList<Release> affectedVersionsList = new ArrayList<Release>();
             
-            Date resolutionDate = formatter.parse(resolutionDateStr);
-            Date creationDate = formatter.parse(creationDateStr);
-            ArrayList<Release> affectedVersionsList = new ArrayList<Release>();
+        		for(int k=0; k<listAV.length(); k++) {
+        			Release affectedVersion = ReleaseUtil.getReleaseByName(listAV.getJSONObject(k).get("name").toString(), releasesList);
+        			affectedVersionsList.add(affectedVersion);            	
+        		}            
+        		Release openVersion = ReleaseUtil.getReleaseByDate(creationDate, releasesList);
+        		Release fixVersion = ReleaseUtil.getReleaseByDate(resolutionDate, releasesList);
             
-            for(int k=0; k<listAV.length(); k++) {
-            	Release affectedVersion = ReleaseUtil.getReleaseByName(listAV.getJSONObject(k).get("name").toString(), releasesList);
-            	affectedVersionsList.add(affectedVersion);            	
-            }            
-            Release openVersion = ReleaseUtil.getReleaseByDate(creationDate, releasesList);
-            Release fixVersion = ReleaseUtil.getReleaseByDate(resolutionDate, releasesList);
-            
-            if(openVersion != null && fixVersion != null) {
-            	ticketsList.add(new Ticket(key, openVersion, fixVersion, affectedVersionsList));
-            }
+        		if(openVersion != null && fixVersion != null) {
+        			ticketsList.add(new Ticket(key, openVersion, fixVersion, affectedVersionsList));
+        		}
+        		
+        	} catch(JSONException e) {
+        		//There is not enough information about the issue: skip this ticket and go on
+        	}
             
         }
         
@@ -121,7 +127,7 @@ public class RetrieveJiraInfo {
 	        JSONArray issues = json.getJSONArray("issues");
 	        total = json.getInt("total");
 	        
-	        ArrayList<Ticket> ticketsList = createTicketInstances(i, j, total, issues, releasesList);
+	        ArrayList<Ticket> ticketsList = createTicketInstances(i, j, total, issues, releasesList);	//FIX THIS: IT SHOULD NOT BE IN LOOP
 	        
 	    } while (i < total);
 	    
