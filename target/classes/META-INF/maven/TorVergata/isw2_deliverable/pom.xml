@@ -7,8 +7,13 @@
   <name>isw2_deliverable</name>
   
   <properties>
+  
   	<maven.compiler.source>1.8</maven.compiler.source>
   	<maven.compiler.target>1.8</maven.compiler.target>
+  	
+ 	<sonar.organization>fanfarillo</sonar.organization>
+  	<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+  	
   </properties>
   
   <dependencies>
@@ -40,6 +45,7 @@
       <artifactId>slf4j-nop</artifactId>
       <version>1.7.25</version>
     </dependency>
+    
   </dependencies>
   
 </project>
