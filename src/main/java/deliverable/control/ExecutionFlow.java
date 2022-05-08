@@ -7,6 +7,7 @@ import java.util.List;
 import org.json.JSONException;
 
 import deliverable.model.Release;
+import deliverable.model.Ticket;
 
 public class ExecutionFlow {
 	
@@ -19,7 +20,14 @@ public class ExecutionFlow {
 		
 		RetrieveJiraInfo retJiraInfo = new RetrieveJiraInfo(projName);
 		List<Release> releasesList = retJiraInfo.retrieveReleases();
-		retJiraInfo.retrieveIssues(releasesList);
+		List<Ticket> ticketsList = retJiraInfo.retrieveIssues(releasesList);
+		
+		ColdStart coldStart = new ColdStart();
+		List<Ticket> otherProjConsistentTickets = coldStart.retrieveOtherConsistentIssues();
+		Double p = coldStart.computeProportion(otherProjConsistentTickets);
+		
+		List<Ticket> consistentTicketsList = retJiraInfo.retrieveConsistentIssues(ticketsList, releasesList);
+		List<Ticket> adjustedTicketsList = retJiraInfo.adjustTicketsList(ticketsList, consistentTicketsList, releasesList, p);
 		
 	}
 

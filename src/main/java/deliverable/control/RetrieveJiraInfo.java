@@ -52,6 +52,7 @@ public class RetrieveJiraInfo {
 					
 				} catch(JSONException e) {
 					//There is no release date: skip this release and go on
+					
 				}
 				
 			}
@@ -110,7 +111,7 @@ public class RetrieveJiraInfo {
         
 	}
 	
-	public void retrieveIssues(List<Release> releasesList) throws JSONException, IOException, ParseException {
+	public List<Ticket> retrieveIssues(List<Release> releasesList) throws JSONException, IOException, ParseException {
 		
 		List<Ticket> ticketsList = new ArrayList<>();
 		
@@ -144,6 +145,134 @@ public class RetrieveJiraInfo {
 	        
 	    } while (i < total);
 	    
+	    return ticketsList;
+	    
+	}
+	
+	private static boolean isConsistentTicket(Ticket ticket) {
+		
+		boolean isOVaffected = false;
+		
+		//If AVs are not available then return false
+		if(ticket.getAv() == null || ticket.getAv().isEmpty()) {
+			return false;
+		}
+		
+		for(int i=0; i<ticket.getAv().size(); i++) {
+			//If there is AV>=FV then return false
+			if(ticket.getAv().get(i).getId() >= ticket.getFv().getId()) {
+				return false;
+			}
+			
+			if(ticket.getAv().get(i).getId() == ticket.getOv().getId()) {
+				isOVaffected = true;
+			}
+			
+		}
+		
+		//If there not exists AV such that AV=OV then return false
+		if(!isOVaffected) {
+			return false;
+		}		
+		return true;
+		
+	}
+	
+	private static Ticket adjustTicket(Ticket ticket, List<Release> releasesList) {
+		
+		List<Release> newAV = new ArrayList<>();
+		
+		ticket.setIv(ticket.getAv().get(0));
+		
+		//Affected versions have to be from IV (=the earliest AV) to FV-1
+		for(int i=ticket.getIv().getId(); i<ticket.getFv().getId(); i++) {
+			for(Release rel : releasesList) {
+				if(rel.getId() == i) {
+					newAV.add(new Release(i, rel.getName(), rel.getDate()));
+					
+				}
+				
+			}
+			
+		}		
+		ticket.setAv(newAV);
+		return ticket;
+		
+	}
+	
+	public List<Ticket> retrieveConsistentIssues(List<Ticket> ticketsList, List<Release> releasesList) {
+		
+		List<Ticket> consistentIssues = new ArrayList<>();
+		
+		for(int i=0; i<ticketsList.size(); i++) {
+			if(isConsistentTicket(ticketsList.get(i))) {
+				consistentIssues.add(adjustTicket(ticketsList.get(i), releasesList));
+				
+			}
+			
+		}
+		return consistentIssues;
+		
+	}
+	
+	private static List<Ticket> retrieveInconsistentTicketsList(List<Ticket> ticketsList, List<Ticket> consistentTicketsList) {
+		
+		List<Ticket> inconsistentTicketsList = new ArrayList<>();
+		
+		for(Ticket ticket : ticketsList) {
+			boolean isConsistent = false;
+			
+			for(Ticket consistentTicket : consistentTicketsList) {				
+				if(ticket.getKey().equals(consistentTicket.getKey())) {
+					isConsistent = true;
+				}
+				
+			}			
+			if(!isConsistent) {
+				inconsistentTicketsList.add(ticket);
+			}
+			
+		}
+		return inconsistentTicketsList;
+		
+	}
+	
+	private static Ticket setInitialAV(Ticket ticket, List<Release> releasesList, Double p) {
+		
+		List<Release> initialAV = new ArrayList<>();
+		
+		//initialAV_ID = IV = max(1; FV-(FV-OV)*P)
+		int initialAV_ID = (int) (ticket.getFv().getId() - (ticket.getFv().getId() - ticket.getOv().getId()) * p);
+		if(initialAV_ID < 1) {
+			initialAV_ID = 1;
+		}
+		
+		for(Release rel : releasesList) {
+			if(rel.getId() == initialAV_ID) {
+				initialAV.add(new Release(initialAV_ID, rel.getName(), rel.getDate()));
+				
+			}
+		
+		}		
+		ticket.setAv(initialAV);
+		return ticket;
+		
+	}
+	
+	public List<Ticket> adjustTicketsList(List<Ticket> ticketsList, List<Ticket> consistentTicketsList, List<Release> releasesList, Double p) {
+		
+		List<Ticket> inconsistentTicketsList = retrieveInconsistentTicketsList(ticketsList, consistentTicketsList);
+		
+		for(Ticket incTicket : inconsistentTicketsList) {
+			//Setting AV and not IV is important for compatibility with adjustTicket(...) reason
+			Ticket incTicketWinitialAV = setInitialAV(incTicket, releasesList, p);
+			Ticket adjustedIncTicket = adjustTicket(incTicketWinitialAV, releasesList);
+			
+			consistentTicketsList.add(adjustedIncTicket);	//Now also adjustedIncTicket has consistent AVs
+			
+		}
+		return consistentTicketsList;	//Now this list contains ALL the tickets with consistent / adjusted AVs
+		
 	}
 
 }
