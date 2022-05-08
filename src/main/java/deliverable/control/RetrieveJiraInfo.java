@@ -68,45 +68,50 @@ public class RetrieveJiraInfo {
 		
 	}
 	
-	private static ArrayList<Ticket> createTicketInstances(Integer i, Integer j, Integer total, JSONArray issues, ArrayList<Release> releasesList) throws ParseException {
+	private static Ticket createTicketInstance(Integer i, JSONArray issues, ArrayList<Release> releasesList) throws ParseException {
 		
-		ArrayList<Ticket> ticketsList = new ArrayList<Ticket>();
+		Ticket ticket = null;
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		
-        for (; i < total && i < j; i++) {
-        	//Iterate through each issue
-        	try {
-        		String key = (issues.getJSONObject(i%1000).get("key").toString()) + ":";
-        		String resolutionDateStr = issues.getJSONObject(i%1000).get("resolutiondate").toString();
-        		String creationDateStr = issues.getJSONObject(i%1000).get("created").toString();            
-        		JSONArray listAV = issues.getJSONObject(i%1000).getJSONArray("versions");
+        try {
+        	String key = (issues.getJSONObject(i%1000).get("key").toString()) + ":";
+        	JSONObject fields = issues.getJSONObject(i%1000).getJSONObject("fields");
+        	
+        	String resolutionDateStr = fields.get("resolutiondate").toString();
+        	String creationDateStr = fields.get("created").toString();            
+        	JSONArray listAV = fields.getJSONArray("versions");
         		
-        		Date resolutionDate = formatter.parse(resolutionDateStr);
-        		Date creationDate = formatter.parse(creationDateStr);
-        		ArrayList<Release> affectedVersionsList = new ArrayList<Release>();
+        	Date resolutionDate = formatter.parse(resolutionDateStr);
+       		Date creationDate = formatter.parse(creationDateStr);
+       		ArrayList<Release> affectedVersionsList = new ArrayList<Release>();
+           
+       		for(int k=0; k<listAV.length(); k++) {
+       			Release affectedVersion = ReleaseUtil.getReleaseByName(listAV.getJSONObject(k).get("name").toString(), releasesList);
+       			
+       			if(affectedVersion != null) {
+       				affectedVersionsList.add(affectedVersion); 
+       			}
+       			
+       		}            
+       		Release openVersion = ReleaseUtil.getReleaseByDate(creationDate, releasesList);
+       		Release fixVersion = ReleaseUtil.getReleaseByDate(resolutionDate, releasesList);
             
-        		for(int k=0; k<listAV.length(); k++) {
-        			Release affectedVersion = ReleaseUtil.getReleaseByName(listAV.getJSONObject(k).get("name").toString(), releasesList);
-        			affectedVersionsList.add(affectedVersion);            	
-        		}            
-        		Release openVersion = ReleaseUtil.getReleaseByDate(creationDate, releasesList);
-        		Release fixVersion = ReleaseUtil.getReleaseByDate(resolutionDate, releasesList);
-            
-        		if(openVersion != null && fixVersion != null) {
-        			ticketsList.add(new Ticket(key, openVersion, fixVersion, affectedVersionsList));
-        		}
+       		if(openVersion != null && fixVersion != null) {
+       			ticket = new Ticket(key, openVersion, fixVersion, affectedVersionsList);
+       		}
         		
-        	} catch(JSONException e) {
-        		//There is not enough information about the issue: skip this ticket and go on
-        	}
-            
-        }
-        
-        return ticketsList;
+       	} catch(JSONException e) {
+       		//There is not enough information about the issue: skip this ticket and go on
+        		
+       	}
+                  
+        return ticket;
         
 	}
 	
 	public void retrieveIssues(ArrayList<Release> releasesList) throws JSONException, IOException, ParseException {
+		
+		ArrayList<Ticket> ticketsList = new ArrayList<Ticket>();
 		
 		Integer i=0;
 		Integer j=0;
@@ -127,7 +132,14 @@ public class RetrieveJiraInfo {
 	        JSONArray issues = json.getJSONArray("issues");
 	        total = json.getInt("total");
 	        
-	        ArrayList<Ticket> ticketsList = createTicketInstances(i, j, total, issues, releasesList);	//FIX THIS: IT SHOULD NOT BE IN LOOP
+	        for (; i < total && i < j; i++) {
+	        	//Iterate through each issue	        
+	        	Ticket ticket = createTicketInstance(i, issues, releasesList);
+	        	if(ticket != null) {
+	        		ticketsList.add(ticket);
+	        	}
+	        
+	        }
 	        
 	    } while (i < total);
 	    
