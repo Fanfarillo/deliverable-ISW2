@@ -171,10 +171,7 @@ public class RetrieveJiraInfo {
 		}
 		
 		//If there not exists AV such that AV=OV then return false
-		if(!isOVaffected) {
-			return false;
-		}		
-		return true;
+		return isOVaffected;
 		
 	}
 	
@@ -241,15 +238,15 @@ public class RetrieveJiraInfo {
 		
 		List<Release> initialAV = new ArrayList<>();
 		
-		//initialAV_ID = IV = max(1; FV-(FV-OV)*P)
-		int initialAV_ID = (int) (ticket.getFv().getId() - (ticket.getFv().getId() - ticket.getOv().getId()) * p);
-		if(initialAV_ID < 1) {
-			initialAV_ID = 1;
+		//initialAVid = IV = max(1; FV-(FV-OV)*P)
+		int initialAVid = (int) (ticket.getFv().getId() - (ticket.getFv().getId() - ticket.getOv().getId()) * p);
+		if(initialAVid < 1) {
+			initialAVid = 1;
 		}
 		
 		for(Release rel : releasesList) {
-			if(rel.getId() == initialAV_ID) {
-				initialAV.add(new Release(initialAV_ID, rel.getName(), rel.getDate()));
+			if(rel.getId() == initialAVid) {
+				initialAV.add(new Release(initialAVid, rel.getName(), rel.getDate()));
 				
 			}
 		

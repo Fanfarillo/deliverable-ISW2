@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.json.JSONException;
 
 import deliverable.model.Release;
@@ -16,7 +18,7 @@ public class ExecutionFlow {
 		throw new IllegalStateException("This class does not have to be instantiated.");
 	}
 	
-	public static void collectData(String projName) throws JSONException, IOException, ParseException {
+	public static void collectData(String projName) throws JSONException, IOException, ParseException, RevisionSyntaxException, GitAPIException {
 		
 		RetrieveJiraInfo retJiraInfo = new RetrieveJiraInfo(projName);
 		List<Release> releasesList = retJiraInfo.retrieveReleases();
@@ -28,6 +30,12 @@ public class ExecutionFlow {
 		
 		List<Ticket> consistentTicketsList = retJiraInfo.retrieveConsistentIssues(ticketsList, releasesList);
 		List<Ticket> adjustedTicketsList = retJiraInfo.adjustTicketsList(ticketsList, consistentTicketsList, releasesList, p);
+		
+		RetrieveGitInfo retGitInfo = new RetrieveGitInfo("C:\\Users\\barba\\OneDrive\\Desktop\\Work in progress\\Progetti ISW2\\" + projName, adjustedTicketsList);
+		retGitInfo.retrieveAllCommits();	//ASSIGN RETURN VALUE TO A VARIABLE
+		
+		//RETRIEVE THE LAST COMMIT OF EACH RELEASE
+		//RETRIEVE ALL THE CLASSES OF THE LAST COMMIT OF EACH RELEASE
 		
 	}
 
