@@ -1,6 +1,6 @@
 package deliverable.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Ticket {
 
@@ -8,9 +8,9 @@ public class Ticket {
 	private Release iv;
 	private Release ov;
 	private Release fv;
-	private ArrayList<Release> av;
+	private List<Release> av;
 	
-	public Ticket(String key, Release ov, Release fv, ArrayList<Release> av) {
+	public Ticket(String key, Release ov, Release fv, List<Release> av) {
 		this.key = key;
 		this.iv = null;
 		this.ov = ov;
@@ -77,14 +77,14 @@ public class Ticket {
 	/**
 	 * @return the av
 	 */
-	public ArrayList<Release> getAv() {
+	public List<Release> getAv() {
 		return av;
 	}
 
 	/**
 	 * @param av the av to set
 	 */
-	public void setAv(ArrayList<Release> av) {
+	public void setAv(List<Release> av) {
 		this.av = av;
 	}
 	

@@ -84,7 +84,7 @@ public class RetrieveJiraInfo {
         		
         	Date resolutionDate = formatter.parse(resolutionDateStr);
        		Date creationDate = formatter.parse(creationDateStr);
-       		ArrayList<Release> affectedVersionsList = new ArrayList<Release>();
+       		ArrayList<Release> affectedVersionsList = new ArrayList<>();
            
        		for(int k=0; k<listAV.length(); k++) {
        			Release affectedVersion = ReleaseUtil.getReleaseByName(listAV.getJSONObject(k).get("name").toString(), releasesList);
