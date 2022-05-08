@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -27,10 +28,10 @@ public class RetrieveJiraInfo {
 		this.projKey = projName.toUpperCase();
 	}
 	
-	public ArrayList<Release> retrieveReleases() throws JSONException, IOException, ParseException {
+	public List<Release> retrieveReleases() throws JSONException, IOException, ParseException {
 		
-		Map<Date, String> unsortedReleasesMap = new HashMap<Date, String>();
-		ArrayList<Release> releasesList = new ArrayList<Release>();
+		Map<Date, String> unsortedReleasesMap = new HashMap<>();
+		List<Release> releasesList = new ArrayList<>();
 		
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		
@@ -40,7 +41,7 @@ public class RetrieveJiraInfo {
 		int total = json.getInt("total");
 		
 		for(int i=0; i<total; i++) {
-			if(releases.getJSONObject(i).get("released").toString() == "true") {
+			if(releases.getJSONObject(i).get("released").toString().equals("true")) {
 				
 				try {
 					String releaseDateString = releases.getJSONObject(i).get("releaseDate").toString();
@@ -56,7 +57,7 @@ public class RetrieveJiraInfo {
 			}
 			
 		}		
-		Map<Date, String> releasesMap = new TreeMap<Date, String>(unsortedReleasesMap);		//TreeMap sorts unsortedReleasesMap by date
+		Map<Date, String> releasesMap = new TreeMap<>(unsortedReleasesMap);		//TreeMap sorts unsortedReleasesMap by date
 		
 		int i=1;
 		for(Map.Entry<Date, String> entry : releasesMap.entrySet()) {	//Iteration over releasesMap
@@ -68,7 +69,7 @@ public class RetrieveJiraInfo {
 		
 	}
 	
-	private static Ticket createTicketInstance(Integer i, JSONArray issues, ArrayList<Release> releasesList) throws ParseException {
+	private static Ticket createTicketInstance(Integer i, JSONArray issues, List<Release> releasesList) throws ParseException {
 		
 		Ticket ticket = null;
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -109,9 +110,9 @@ public class RetrieveJiraInfo {
         
 	}
 	
-	public void retrieveIssues(ArrayList<Release> releasesList) throws JSONException, IOException, ParseException {
+	public void retrieveIssues(List<Release> releasesList) throws JSONException, IOException, ParseException {
 		
-		ArrayList<Ticket> ticketsList = new ArrayList<Ticket>();
+		List<Ticket> ticketsList = new ArrayList<>();
 		
 		Integer i=0;
 		Integer j=0;

@@ -1,13 +1,18 @@
 package deliverable.utils;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import deliverable.model.Release;
 
 public class ReleaseUtil {
+	
+	//This private constructor is meant to hide the public one: utility classes do not have to be instantiated.
+	private ReleaseUtil() {
+		throw new IllegalStateException("This class does not have to be instantiated.");
+	}
 
-	public static Release getReleaseByName(String releaseName, ArrayList<Release> releasesList) {
+	public static Release getReleaseByName(String releaseName, List<Release> releasesList) {
 		
 		for(Release rel : releasesList) {
 			if(rel.getName().equals(releaseName)) {
@@ -19,7 +24,7 @@ public class ReleaseUtil {
 		
 	}
 	
-	public static Release getReleaseByDate(Date date, ArrayList<Release> releasesList) {
+	public static Release getReleaseByDate(Date date, List<Release> releasesList) {
 		
 		for(Release rel : releasesList) {
 			if(rel.getDate().after(date)) {

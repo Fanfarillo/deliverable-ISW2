@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,37 +14,44 @@ import org.json.JSONObject;
 
 public class JSONUtil {
 	
+	//This private constructor is meant to hide the public one: utility classes do not have to be instantiated.
+	private JSONUtil() {
+		throw new IllegalStateException("This class does not have to be instantiated.");
+	}
+	
 	private static String readAll(Reader rd) throws IOException {
+		
 		StringBuilder sb = new StringBuilder();
 		int cp;
 		while ((cp = rd.read()) != -1) {
 			sb.append((char) cp);
 		}
-		    return sb.toString();
+		
+		return sb.toString();
 	}
 
 	public static JSONArray readJsonArrayFromUrl(String url) throws IOException, JSONException {
-		InputStream is = new URL(url).openStream();
-	    try {
-	    	BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+		
+	    try(InputStream is = new URL(url).openStream())
+	    {
+	    	BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 	        String jsonText = readAll(rd);
-	        JSONArray json = new JSONArray(jsonText);
-	        return json;
-	    } finally {
-	        is.close();
+	        return new JSONArray(jsonText);
+
 	    }
+	    
 	}
 
 	public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-		InputStream is = new URL(url).openStream();
-	    try {
-	    	BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+		
+	    try(InputStream is = new URL(url).openStream())
+	    {
+	    	BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 	        String jsonText = readAll(rd);
-	        JSONObject json = new JSONObject(jsonText);
-	        return json;
-	    } finally {
-	        is.close();
+	        return new JSONObject(jsonText);
+
 	    }
+	    
 	}
 
 }

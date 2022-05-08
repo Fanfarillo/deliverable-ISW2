@@ -12,9 +12,7 @@ public class Main {
 	public static void main(String[] args) throws JSONException, IOException, ParseException {
 		
 		ExecutionFlow.collectData("avro");
-		//ExecutionFlow.collectData("bookkeeper");
-		
-		return;
+		//Same with bookkeeper
 		
 	}
 
