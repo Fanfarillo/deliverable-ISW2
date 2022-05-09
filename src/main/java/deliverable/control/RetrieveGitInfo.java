@@ -40,17 +40,17 @@ public class RetrieveGitInfo {
 		this.releases = releasesList;
 		
 		//We are removing issues without AV (i.e. with FV=IV) because they are not influent on classes buggyness
-		List<Ticket> ticketsWithAV = new ArrayList<>();
+		List<Ticket> ticketsAV = new ArrayList<>();
 		for(Ticket ticket : ticketsList) {
 			if(ticket.getAv() != null && !ticket.getAv().isEmpty()) {
-				ticketsWithAV.add(ticket);
+				ticketsAV.add(ticket);
 			}
 		}
-		this.ticketsWithAV = ticketsWithAV;
+		this.ticketsWithAV = ticketsAV;
 		
 	}
 	
-	public List<RevCommit> retrieveAllCommits() throws GitAPIException, RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException {
+	public List<RevCommit> retrieveAllCommits() throws GitAPIException, RevisionSyntaxException, IOException {
 		
 		List<RevCommit> allCommitsList = new ArrayList<>();		
 		List<Ref> branchesList = this.git.branchList().setListMode(ListMode.ALL).call();
@@ -87,7 +87,7 @@ public class RetrieveGitInfo {
 		
 	}
 	
-	private List<String> getClasses(RevCommit commit) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
+	private List<String> getClasses(RevCommit commit) throws IOException {
 		
 		List<String> javaClasses = new ArrayList<>();
 		
@@ -108,7 +108,7 @@ public class RetrieveGitInfo {
 		
 	}
 	
-	public List<ReleaseCommits> getRelClassesAssociations(List<ReleaseCommits> relCommAssociations) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
+	public List<ReleaseCommits> getRelClassesAssociations(List<ReleaseCommits> relCommAssociations) throws IOException {
 		
 		for(ReleaseCommits relComm : relCommAssociations) {
 			List<String> javaClasses = getClasses(relComm.getLastCommit());

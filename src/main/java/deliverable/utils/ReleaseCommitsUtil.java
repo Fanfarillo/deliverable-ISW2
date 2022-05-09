@@ -39,7 +39,7 @@ public class ReleaseCommitsUtil {
 		for(RevCommit commit : commitsList) {
 			Date commitDate = commit.getCommitterIdent().getWhen();
 			
-			//if (firstDate < commitDate <= lastDate) then add the commit in matchingCommits list
+			//if firstDate < commitDate <= lastDate then add the commit in matchingCommits list
 			if(commitDate.after(firstDate) && (commitDate.before(lastDate) || commitDate.equals(lastDate))) {
 				matchingCommits.add(commit);
 				
