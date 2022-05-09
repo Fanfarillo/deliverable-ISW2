@@ -9,6 +9,7 @@ import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.json.JSONException;
 
+import deliverable.model.JavaClass;
 import deliverable.model.Release;
 import deliverable.model.ReleaseCommits;
 import deliverable.model.Ticket;
@@ -36,7 +37,9 @@ public class ExecutionFlow {
 		RetrieveGitInfo retGitInfo = new RetrieveGitInfo("C:\\Users\\barba\\OneDrive\\Desktop\\Work in progress\\Progetti ISW2\\" + projName, adjustedTicketsList, releasesList);
 		List<RevCommit> allCommitsList = retGitInfo.retrieveAllCommits();
 		List<ReleaseCommits> relCommAssociationsList = retGitInfo.getRelCommAssociations(allCommitsList);
-		List<ReleaseCommits> assocListWClasses = retGitInfo.getRelClassesAssociations(relCommAssociationsList);
+		retGitInfo.getRelClassesAssociations(relCommAssociationsList);
+		List<JavaClass> javaClassesList = retGitInfo.labelClasses(relCommAssociationsList);
+		retGitInfo.assignCommitsToClasses(javaClassesList, allCommitsList, relCommAssociationsList);
 		
 	}
 

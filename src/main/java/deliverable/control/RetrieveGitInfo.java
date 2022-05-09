@@ -10,17 +10,26 @@ import java.util.List;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 
+import deliverable.model.JavaClass;
 import deliverable.model.Release;
 import deliverable.model.ReleaseCommits;
 import deliverable.model.Ticket;
+import deliverable.utils.JavaClassUtil;
 import deliverable.utils.ReleaseCommitsUtil;
 
 public class RetrieveGitInfo {
@@ -104,14 +113,125 @@ public class RetrieveGitInfo {
 		
 	}
 	
-	public List<ReleaseCommits> getRelClassesAssociations(List<ReleaseCommits> relCommAssociations) throws IOException {
+	public void getRelClassesAssociations(List<ReleaseCommits> relCommAssociations) throws IOException {
 		
 		for(ReleaseCommits relComm : relCommAssociations) {
 			List<String> javaClasses = getClasses(relComm.getLastCommit());
 			relComm.setJavaClasses(javaClasses);
 			
 		}
-		return relCommAssociations;
+		
+	}
+	
+	private List<RevCommit> getTicketCommits(Ticket ticket) throws GitAPIException, IOException {
+		
+		//Here there will be the commits related to the tickets involving the affected versions of ticket;
+		//commits have a ticket ID included in their comments (full messages)
+		List<RevCommit> associatedCommits = new ArrayList<>();
+		List<Ref> branchesList = this.git.branchList().setListMode(ListMode.ALL).call();
+
+		//Branches loop
+		for(Ref branch : branchesList) {
+			Iterable<RevCommit> commitsList = this.git.log().add(repo.resolve(branch.getName())).call();
+
+			//Commits loop within a specific branch
+			for(RevCommit commit : commitsList) {
+				String comment = commit.getFullMessage();	
+				
+				//We are keeping only commits related to Jira tickets previously found
+				if(comment.contains(ticket.getKey()) && !associatedCommits.contains(commit)) {	
+					associatedCommits.add(commit);
+				}				
+							
+			}
+		
+		}
+		return associatedCommits;		
+		
+	}
+	
+	private List<String> getModifiedClasses(RevCommit commit) throws IOException {
+		
+		List<String> modifiedClasses = new ArrayList<>();	//Here there will be the names of the classes that have been modified by the commit
+		
+		try(DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {			
+			ObjectReader reader = this.repo.newObjectReader();
+			
+			CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+			ObjectId newTree = commit.getTree();
+			newTreeIter.reset(reader, newTree);
+		
+			RevCommit commitParent = commit.getParent(0);	//It's the previous commit of the commit we are considering
+			CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+			ObjectId oldTree = commitParent.getTree();
+			oldTreeIter.reset(reader, oldTree);
+	
+			diffFormatter.setRepository(this.repo);
+			List<DiffEntry> entries = diffFormatter.scan(oldTreeIter, newTreeIter);
+		
+			//Every entry contains info for each file involved in the commit (old path name, new path name, change type (that could be MODIFY, ADD, RENAME, etc.))
+			for(DiffEntry entry : entries) {
+				//We are keeping only Java classes that are not involved in tests
+				if(entry.getChangeType().equals(ChangeType.MODIFY) && entry.getNewPath().contains(".java") && !entry.getNewPath().contains("/test/")) {
+					modifiedClasses.add(entry.getNewPath());
+				}
+			
+			}
+		
+		} catch(ArrayIndexOutOfBoundsException e) {
+			//commit has no parents: skip this commit, return an empty list and go on
+			
+		}
+		
+		return modifiedClasses;
+		
+	}
+	
+	private void doLabeling(List<JavaClass> javaClasses, Ticket ticket, List<ReleaseCommits> relCommAssociations) throws GitAPIException, IOException {
+		
+		List<RevCommit> commitsAssociatedWIssue = getTicketCommits(ticket);
+		
+		for(RevCommit commit : commitsAssociatedWIssue) {
+			Release associatedRelease = ReleaseCommitsUtil.getReleaseOfCommit(commit, relCommAssociations);
+			List<String> modifiedClasses = getModifiedClasses(commit);
+			
+			for(String modifClass : modifiedClasses) {
+				JavaClassUtil.updateJavaClassBuggyness(javaClasses, modifClass, ticket.getIv(), associatedRelease);
+				
+			}
+			
+		}
+		
+	}
+	
+	public List<JavaClass> labelClasses(List<ReleaseCommits> relCommAssociations) throws GitAPIException, IOException {
+		
+		List<JavaClass> javaClasses = JavaClassUtil.buildAllJavaClasses(relCommAssociations);
+		
+		for(Ticket ticket : this.ticketsWithAV) {
+			doLabeling(javaClasses, ticket, relCommAssociations);
+			
+		}
+		return javaClasses;
+		
+	}
+	
+	public void assignCommitsToClasses(List<JavaClass> javaClasses, List<RevCommit> commits, List<ReleaseCommits> relCommAssociations) throws IOException {	
+		
+		for(RevCommit commit : commits) {
+			Release associatedRelease = ReleaseCommitsUtil.getReleaseOfCommit(commit, relCommAssociations);
+			
+			if(associatedRelease != null) {		//There are also commits with no associatedRelease because their date is latter than last release date			
+				List<String> modifiedClasses = getModifiedClasses(commit);
+			
+				for(String modifClass : modifiedClasses) {
+					JavaClassUtil.updateJavaClassCommits(javaClasses, modifClass, associatedRelease, commit);
+				
+				}
+			
+			}	
+				
+		}
 		
 	}
 

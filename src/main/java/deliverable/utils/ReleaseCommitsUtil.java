@@ -51,5 +51,20 @@ public class ReleaseCommitsUtil {
 		return new ReleaseCommits(release, matchingCommits, lastCommit);
 		
 	}
+	
+	public static Release getReleaseOfCommit(RevCommit commit, List<ReleaseCommits> relCommAssociations) {
+		
+		for(ReleaseCommits relComm : relCommAssociations) {
+			for(RevCommit c : relComm.getCommits()) {
+				if(c.equals(commit)) {
+					return relComm.getRelease();
+				}
+				
+			}
+			
+		}
+		return null;
+		
+	}
 
 }
