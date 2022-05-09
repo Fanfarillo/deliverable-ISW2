@@ -125,8 +125,8 @@ public class RetrieveGitInfo {
 	
 	private List<RevCommit> getTicketCommits(Ticket ticket) throws GitAPIException, IOException {
 		
-		//Here there will be the commits related to the tickets involving the affected versions of ticket;
-		//commits have a ticket ID included in their comments (full messages)
+		//Here there will be the commits related to the tickets involving the affected versions of ticket
+		//Commits have a ticket ID included in their comments (full messages)
 		List<RevCommit> associatedCommits = new ArrayList<>();
 		List<Ref> branchesList = this.git.branchList().setListMode(ListMode.ALL).call();
 
@@ -154,9 +154,9 @@ public class RetrieveGitInfo {
 		
 		List<String> modifiedClasses = new ArrayList<>();	//Here there will be the names of the classes that have been modified by the commit
 		
-		try(DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {			
-			ObjectReader reader = this.repo.newObjectReader();
-			
+		try(DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+			ObjectReader reader = this.repo.newObjectReader()) {			
+						
 			CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
 			ObjectId newTree = commit.getTree();
 			newTreeIter.reset(reader, newTree);
