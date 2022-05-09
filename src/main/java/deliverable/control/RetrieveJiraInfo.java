@@ -18,6 +18,7 @@ import deliverable.model.Release;
 import deliverable.model.Ticket;
 import deliverable.utils.JSONUtil;
 import deliverable.utils.ReleaseUtil;
+import deliverable.utils.TicketUtil;
 
 
 public class RetrieveJiraInfo {
@@ -149,61 +150,13 @@ public class RetrieveJiraInfo {
 	    
 	}
 	
-	private static boolean isConsistentTicket(Ticket ticket) {
-		
-		boolean isOVaffected = false;
-		
-		//If AVs are not available then return false
-		if(ticket.getAv() == null || ticket.getAv().isEmpty()) {
-			return false;
-		}
-		
-		for(int i=0; i<ticket.getAv().size(); i++) {
-			//If there is AV>=FV then return false
-			if(ticket.getAv().get(i).getId() >= ticket.getFv().getId()) {
-				return false;
-			}
-			
-			if(ticket.getAv().get(i).getId() == ticket.getOv().getId()) {
-				isOVaffected = true;
-			}
-			
-		}
-		
-		//If there not exists AV such that AV=OV then return false
-		return isOVaffected;
-		
-	}
-	
-	private static Ticket adjustTicket(Ticket ticket, List<Release> releasesList) {
-		
-		List<Release> newAV = new ArrayList<>();
-		
-		ticket.setIv(ticket.getAv().get(0));
-		
-		//Affected versions have to be from IV (=the earliest AV) to FV-1
-		for(int i=ticket.getIv().getId(); i<ticket.getFv().getId(); i++) {
-			for(Release rel : releasesList) {
-				if(rel.getId() == i) {
-					newAV.add(new Release(i, rel.getName(), rel.getDate()));
-					
-				}
-				
-			}
-			
-		}		
-		ticket.setAv(newAV);
-		return ticket;
-		
-	}
-	
 	public List<Ticket> retrieveConsistentIssues(List<Ticket> ticketsList, List<Release> releasesList) {
 		
 		List<Ticket> consistentIssues = new ArrayList<>();
 		
 		for(int i=0; i<ticketsList.size(); i++) {
-			if(isConsistentTicket(ticketsList.get(i))) {
-				consistentIssues.add(adjustTicket(ticketsList.get(i), releasesList));
+			if(TicketUtil.isConsistentTicket(ticketsList.get(i))) {
+				consistentIssues.add(TicketUtil.adjustTicket(ticketsList.get(i), releasesList));
 				
 			}
 			
@@ -234,36 +187,14 @@ public class RetrieveJiraInfo {
 		
 	}
 	
-	private static Ticket setInitialAV(Ticket ticket, List<Release> releasesList, Double p) {
-		
-		List<Release> initialAV = new ArrayList<>();
-		
-		//initialAVid = IV = max(1; FV-(FV-OV)*P)
-		int initialAVid = (int) (ticket.getFv().getId() - (ticket.getFv().getId() - ticket.getOv().getId()) * p);
-		if(initialAVid < 1) {
-			initialAVid = 1;
-		}
-		
-		for(Release rel : releasesList) {
-			if(rel.getId() == initialAVid) {
-				initialAV.add(new Release(initialAVid, rel.getName(), rel.getDate()));
-				
-			}
-		
-		}		
-		ticket.setAv(initialAV);
-		return ticket;
-		
-	}
-	
 	public List<Ticket> adjustTicketsList(List<Ticket> ticketsList, List<Ticket> consistentTicketsList, List<Release> releasesList, Double p) {
 		
 		List<Ticket> inconsistentTicketsList = retrieveInconsistentTicketsList(ticketsList, consistentTicketsList);
 		
 		for(Ticket incTicket : inconsistentTicketsList) {
 			//Setting AV and not IV is important for compatibility with adjustTicket(...) reason
-			Ticket incTicketWinitialAV = setInitialAV(incTicket, releasesList, p);
-			Ticket adjustedIncTicket = adjustTicket(incTicketWinitialAV, releasesList);
+			Ticket incTicketWinitialAV = TicketUtil.setInitialAV(incTicket, releasesList, p);
+			Ticket adjustedIncTicket = TicketUtil.adjustTicket(incTicketWinitialAV, releasesList);
 			
 			consistentTicketsList.add(adjustedIncTicket);	//Now also adjustedIncTicket has consistent AVs
 			

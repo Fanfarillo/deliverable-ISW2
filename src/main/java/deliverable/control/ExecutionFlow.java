@@ -6,9 +6,11 @@ import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.json.JSONException;
 
 import deliverable.model.Release;
+import deliverable.model.ReleaseCommits;
 import deliverable.model.Ticket;
 
 public class ExecutionFlow {
@@ -31,11 +33,10 @@ public class ExecutionFlow {
 		List<Ticket> consistentTicketsList = retJiraInfo.retrieveConsistentIssues(ticketsList, releasesList);
 		List<Ticket> adjustedTicketsList = retJiraInfo.adjustTicketsList(ticketsList, consistentTicketsList, releasesList, p);
 		
-		RetrieveGitInfo retGitInfo = new RetrieveGitInfo("C:\\Users\\barba\\OneDrive\\Desktop\\Work in progress\\Progetti ISW2\\" + projName, adjustedTicketsList);
-		retGitInfo.retrieveAllCommits();	//ASSIGN RETURN VALUE TO A VARIABLE
-		
-		//RETRIEVE THE LAST COMMIT OF EACH RELEASE
-		//RETRIEVE ALL THE CLASSES OF THE LAST COMMIT OF EACH RELEASE
+		RetrieveGitInfo retGitInfo = new RetrieveGitInfo("C:\\Users\\barba\\OneDrive\\Desktop\\Work in progress\\Progetti ISW2\\" + projName, adjustedTicketsList, releasesList);
+		List<RevCommit> allCommitsList = retGitInfo.retrieveAllCommits();
+		List<ReleaseCommits> relCommAssociationsList = retGitInfo.getRelCommAssociations(allCommitsList);
+		List<ReleaseCommits> assocListWClasses = retGitInfo.getRelClassesAssociations(relCommAssociationsList);
 		
 	}
 
