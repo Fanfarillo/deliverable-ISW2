@@ -237,7 +237,7 @@ public class RetrieveGitInfo {
 		
 	}
 	
-	public List<JavaClass> getCurrentClasses(List<RevCommit> allCommits) throws GitAPIException, IOException {
+	public List<JavaClass> getCurrentClasses(List<RevCommit> allCommits) throws IOException {
 		//allCommits is a useful parameter: it allows to get the commits AFTER the last release without doing new computations with Jgit
 		
 		/*We need to call getCommitsOfRelease method of ReleaseCommitsUtil class in order to get:
