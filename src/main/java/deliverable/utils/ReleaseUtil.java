@@ -36,4 +36,18 @@ public class ReleaseUtil {
 		
 	}
 	
+	public static Release getLastRelease(List<Release> releasesList) {
+		
+		Release lastRelease = releasesList.get(0);
+		for(Release release : releasesList) {
+			//if releaseDate > lastReleaseDate then refresh lastRelease
+			if(release.getDate().after(lastRelease.getDate())) {
+				lastRelease = release;
+			}
+			
+		}
+		return lastRelease;
+			
+	}
+	
 }

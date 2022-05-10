@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import deliverable.model.ReleaseCommits;
 import deliverable.model.Ticket;
 import deliverable.utils.JavaClassUtil;
 import deliverable.utils.ReleaseCommitsUtil;
+import deliverable.utils.ReleaseUtil;
 
 public class RetrieveGitInfo {
 	
@@ -233,6 +235,41 @@ public class RetrieveGitInfo {
 				
 		}
 		
+	}
+	
+	public List<JavaClass> getCurrentClasses(List<RevCommit> allCommits) throws GitAPIException, IOException {
+		//allCommits is a useful parameter: it allows to get the commits AFTER the last release without doing new computations with Jgit
+		
+		/*We need to call getCommitsOfRelease method of ReleaseCommitsUtil class in order to get:
+		 * The commits after the last release
+		 * Current commit
+		 * To do this, we need to retrieve the date of the last release and to create a new Release instance (that will be related to the next release) */
+		
+		Release lastRelease = ReleaseUtil.getLastRelease(this.releases);
+		Date lastReleaseDate = lastRelease.getDate();
+		Release futureRelease = new Release(lastRelease.getId()+1, null, Calendar.getInstance().getTime());		//Last param is TODAY
+		
+		ReleaseCommits currentRelComm = ReleaseCommitsUtil.getCommitsOfRelease(allCommits, futureRelease, lastReleaseDate);
+		List<String> currentJavaClasses = getClasses(currentRelComm.getLastCommit());
+		currentRelComm.setJavaClasses(currentJavaClasses);
+		//Now currentRelComm has all the attributes setted
+		//(future release, commits associated to future release, very last commit and current Java classes, that will be associated to future release too)
+		
+		List<ReleaseCommits> currentRelCommList = new ArrayList<>();	//We need a list just for compatibility with method buildAllJavaClasses reason
+		currentRelCommList.add(currentRelComm);
+		List<JavaClass> javaClassInstances = JavaClassUtil.buildAllJavaClasses(currentRelCommList);
+		
+		for(RevCommit commit : currentRelComm.getCommits()) {
+			List<String> modifiedClasses = getModifiedClasses(commit);
+			
+			for(String modifClass : modifiedClasses) {
+				JavaClassUtil.updateJavaClassCommits(javaClassInstances, modifClass, futureRelease, commit);
+			
+			}
+			
+		}
+		return javaClassInstances;
+	
 	}
 
 }
