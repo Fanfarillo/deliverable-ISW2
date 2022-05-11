@@ -2,6 +2,7 @@ package deliverable.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jgit.revwalk.RevCommit;
 
@@ -21,8 +22,8 @@ public class JavaClassUtil {
 		List<JavaClass> javaClasses = new ArrayList<>();
 		
 		for(ReleaseCommits relComm : relCommAssociations) {
-			for(String javaClass : relComm.getJavaClasses()) {
-				javaClasses.add(new JavaClass(javaClass, relComm.getRelease()));
+			for(Map.Entry<String, String> entryMap : relComm.getJavaClasses().entrySet()) {
+				javaClasses.add(new JavaClass(entryMap.getKey(), entryMap.getValue(), relComm.getRelease()));
 				
 			}
 			

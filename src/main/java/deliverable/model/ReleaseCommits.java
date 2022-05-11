@@ -1,6 +1,7 @@
 package deliverable.model;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jgit.revwalk.RevCommit;
 
@@ -9,7 +10,7 @@ public class ReleaseCommits {
 	private Release release;
 	private List<RevCommit> commits;
 	private RevCommit lastCommit;
-	private List<String> javaClasses;
+	private Map<String, String> javaClasses;
 	
 	public ReleaseCommits(Release release, List<RevCommit> commits, RevCommit lastCommit) {
 		this.release = release;
@@ -64,14 +65,14 @@ public class ReleaseCommits {
 	/**
 	 * @return the javaClasses
 	 */
-	public List<String> getJavaClasses() {
+	public Map<String, String> getJavaClasses() {
 		return javaClasses;
 	}
 
 	/**
 	 * @param javaClasses the javaClasses to set
 	 */
-	public void setJavaClasses(List<String> javaClasses) {
+	public void setJavaClasses(Map<String, String> javaClasses) {
 		this.javaClasses = javaClasses;
 	}
 

@@ -1,19 +1,26 @@
 package deliverable.control;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.Edit;
+import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
+import org.eclipse.jgit.errors.CorruptObjectException;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -94,9 +101,9 @@ public class RetrieveGitInfo {
 		
 	}
 	
-	private List<String> getClasses(RevCommit commit) throws IOException {
+	private Map<String, String> getClasses(RevCommit commit) throws IOException {
 		
-		List<String> javaClasses = new ArrayList<>();
+		Map<String, String> javaClasses = new HashMap<>();
 		
 		RevTree tree = commit.getTree();	//We get the tree of the files and the directories that were belonging to the repository when commit was pushed
 		TreeWalk treeWalk = new TreeWalk(this.repo);	//We use a TreeWalk to iterate over all files in the Tree recursively
@@ -106,7 +113,8 @@ public class RetrieveGitInfo {
 		while(treeWalk.next()) {
 			//We are keeping only Java classes that are not involved in tests
 			if(treeWalk.getPathString().contains(".java") && !treeWalk.getPathString().contains("/test/")) {
-				javaClasses.add(treeWalk.getPathString());
+				//We are retrieving (name class, content class) couples
+				javaClasses.put(treeWalk.getPathString(), new String(this.repo.open(treeWalk.getObjectId(0)).getBytes(), StandardCharsets.UTF_8));
 			}
 		}		
 		treeWalk.close();
@@ -118,7 +126,7 @@ public class RetrieveGitInfo {
 	public void getRelClassesAssociations(List<ReleaseCommits> relCommAssociations) throws IOException {
 		
 		for(ReleaseCommits relComm : relCommAssociations) {
-			List<String> javaClasses = getClasses(relComm.getLastCommit());
+			Map<String, String> javaClasses = getClasses(relComm.getLastCommit());
 			relComm.setJavaClasses(javaClasses);
 			
 		}
@@ -250,7 +258,7 @@ public class RetrieveGitInfo {
 		Release futureRelease = new Release(lastRelease.getId()+1, null, Calendar.getInstance().getTime());		//Last param is TODAY
 		
 		ReleaseCommits currentRelComm = ReleaseCommitsUtil.getCommitsOfRelease(allCommits, futureRelease, lastReleaseDate);
-		List<String> currentJavaClasses = getClasses(currentRelComm.getLastCommit());
+		Map<String, String> currentJavaClasses = getClasses(currentRelComm.getLastCommit());
 		currentRelComm.setJavaClasses(currentJavaClasses);
 		//Now currentRelComm has all the attributes setted
 		//(future release, commits associated to future release, very last commit and current Java classes, that will be associated to future release too)
@@ -270,6 +278,61 @@ public class RetrieveGitInfo {
 		}
 		return javaClassInstances;
 	
+	}
+	
+	private int getAddedLines(DiffFormatter diffFormatter, DiffEntry entry) throws IOException {
+		
+		int addedLines = 0;
+		for(Edit edit : diffFormatter.toFileHeader(entry).toEditList()) {
+			addedLines += edit.getEndA() - edit.getBeginA();
+			
+		}
+		return addedLines;
+		
+	}
+	
+	private int getDeletedLines(DiffFormatter diffFormatter, DiffEntry entry) throws IOException {
+		
+		int deletedLines = 0;
+		for(Edit edit : diffFormatter.toFileHeader(entry).toEditList()) {
+			deletedLines += edit.getEndB() - edit.getBeginB();
+			
+		}
+		return deletedLines;
+		
+	}
+	
+	public void computeAddedAndDeletedLinesList(JavaClass javaClass) throws IOException {
+		
+		List<Integer> addedLinesList = new ArrayList<>();	
+		List<Integer> deletedLinesList = new ArrayList<>();
+		
+		for(RevCommit comm : javaClass.getCommits()) {		
+			try(DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
+				
+				RevCommit parentComm = comm.getParent(0);
+				
+				diffFormatter.setRepository(this.repo);
+				diffFormatter.setDiffComparator(RawTextComparator.DEFAULT);
+				
+				List<DiffEntry> diffs = diffFormatter.scan(parentComm.getTree(), comm.getTree());
+				for(DiffEntry entry : diffs) {
+					if(entry.getNewPath().equals(javaClass.getName())) {
+						getAddedLines(diffFormatter, entry);
+						getDeletedLines(diffFormatter, entry);
+						//ADD THESE VALUES IN LISTS BUT BE CAREFUL IN HOW
+						
+					}
+					
+				}
+			
+			} catch(ArrayIndexOutOfBoundsException e) {
+			//commit has no parents: skip this commit, return an empty list and go on
+			
+			}
+			
+		}
+		
 	}
 
 }

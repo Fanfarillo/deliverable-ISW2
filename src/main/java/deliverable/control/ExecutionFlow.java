@@ -45,6 +45,9 @@ public class ExecutionFlow {
 		//Training set and testing set will be distinguishable through the name of the attribute Release of JavaClasses: in case of instances of testing set, this name is null
 		javaClassesList.addAll(currentJavaClassesList);
 		
+		ComputeMetrics computeMetrics = new ComputeMetrics(retGitInfo, javaClassesList);
+		computeMetrics.doAllMetricsComputation();	//DO NOT FORGET RETURN VALUE!!
+		
 	}
 
 }
