@@ -58,5 +58,19 @@ public class JavaClassUtil {
 		}
 		
 	}
+	
+	public static List<JavaClass> cutHalfReleases(List<JavaClass> javaClassesList, List<Release> releasesList) {
+		
+		List<JavaClass> remainingJavaClasses = new ArrayList<>();
+		
+		for(JavaClass javaClass : javaClassesList) {
+			if(javaClass.getRelease().getId() <= ReleaseUtil.getLastRelease(releasesList).getId()/2) {
+				remainingJavaClasses.add(javaClass);
+			}
+			
+		}
+		return remainingJavaClasses;
+		
+	}
 
 }

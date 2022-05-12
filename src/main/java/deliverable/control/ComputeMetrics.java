@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import deliverable.model.JavaClass;
@@ -42,11 +41,11 @@ public class ComputeMetrics {
 	private void computeNAuth() {
 		
 		for(JavaClass javaClass : this.javaClassesList) {
-			List<PersonIdent> classAuthors = new ArrayList<>();
+			List<String> classAuthors = new ArrayList<>();
 			
 			for(RevCommit commit : javaClass.getCommits()) {
-				if(!classAuthors.contains(commit.getAuthorIdent())) {
-					classAuthors.add(commit.getAuthorIdent());
+				if(!classAuthors.contains(commit.getAuthorIdent().getName())) {
+					classAuthors.add(commit.getAuthorIdent().getName());
 				}
 				
 			}
@@ -60,8 +59,10 @@ public class ComputeMetrics {
 		
 		int sumLOC = 0;
 		int maxLOC = 0;
+		double avgLOC = 0;
 		int churn = 0;
 		int maxChurn = 0;
+		double avgChurn = 0;
 		
 		for(int i=0; i<javaClass.getAddedLinesList().size(); i++) {
 			
@@ -80,8 +81,13 @@ public class ComputeMetrics {
 			
 		}
 		
-		double avgLOC = 1.0*sumLOC/javaClass.getAddedLinesList().size();
-		double avgChurn = 1.0*churn/javaClass.getAddedLinesList().size();
+		//If a class has 0 revisions, its AvgLocAdded and AvgChurn are 0 (see initialization above).
+		if(javaClass.getAddedLinesList().size() != 0) {		 
+			avgLOC = 1.0*sumLOC/javaClass.getAddedLinesList().size();
+		}
+		if(javaClass.getAddedLinesList().size() != 0) {
+			avgChurn = 1.0*churn/javaClass.getAddedLinesList().size();
+		}
 		
 		javaClass.setLocAdded(sumLOC);
 		javaClass.setMaxLocAdded(maxLOC);

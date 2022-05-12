@@ -13,6 +13,7 @@ import deliverable.model.JavaClass;
 import deliverable.model.Release;
 import deliverable.model.ReleaseCommits;
 import deliverable.model.Ticket;
+import deliverable.utils.JavaClassUtil;
 
 public class ExecutionFlow {
 	
@@ -48,8 +49,9 @@ public class ExecutionFlow {
 		
 		ComputeMetrics computeMetrics = new ComputeMetrics(retGitInfo, javaClassesList);
 		javaClassesList = computeMetrics.doAllMetricsComputation();
+		List<JavaClass> remJavaClassesList = JavaClassUtil.cutHalfReleases(javaClassesList, releasesList);
 		
-		CreateCsv createCsv = new CreateCsv(projName, javaClassesList);
+		CreateCsv createCsv = new CreateCsv(projName, remJavaClassesList);
 		createCsv.writeOnCsv();
 		
 	}

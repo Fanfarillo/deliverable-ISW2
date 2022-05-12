@@ -28,7 +28,7 @@ public class CreateCsv {
 		
 		Workbook wb = new HSSFWorkbook();
 		
-		try(OutputStream os = new FileOutputStream("Buggy_classes.csv")) {
+		try(OutputStream os = new FileOutputStream("Buggy_classes_" + this.projName + ".csv")) {
 			Sheet sheet = wb.createSheet(this.projName);
 			
 	        Row row = sheet.createRow(0);	//First row
