@@ -56,23 +56,68 @@ public class ComputeMetrics {
 		
 	}
 	
+	private void computeLocAndChurnMetrics(JavaClass javaClass) {
+		
+		int sumLOC = 0;
+		int maxLOC = 0;
+		int churn = 0;
+		int maxChurn = 0;
+		
+		for(int i=0; i<javaClass.getAddedLinesList().size(); i++) {
+			
+			int currentLOC = javaClass.getAddedLinesList().get(i);
+			int currentDiff = Math.abs(javaClass.getAddedLinesList().get(i) - javaClass.getDeletedLinesList().get(i));
+			
+			sumLOC = sumLOC + currentLOC;
+			churn = churn + currentDiff;
+			
+			if(currentLOC > maxLOC) {
+				maxLOC = currentLOC;
+			}
+			if(currentDiff > maxChurn) {
+				maxChurn = currentDiff;
+			}
+			
+		}
+		
+		double avgLOC = 1.0*sumLOC/javaClass.getAddedLinesList().size();
+		double avgChurn = 1.0*churn/javaClass.getAddedLinesList().size();
+		
+		javaClass.setLocAdded(sumLOC);
+		javaClass.setMaxLocAdded(maxLOC);
+		javaClass.setAvgLocAdded(avgLOC);
+		javaClass.setChurn(churn);
+		javaClass.setMaxChurn(maxChurn);
+		javaClass.setAvgChurn(avgChurn);
+		
+	}
+	
 	private void computeLocAndChurn() throws IOException {
 		
 		for(JavaClass javaClass : this.javaClassesList) {
 			
 			this.retGitInfo.computeAddedAndDeletedLinesList(javaClass);
+			computeLocAndChurnMetrics(javaClass);
 			
 		}
 		
 	}
 	
-	public void doAllMetricsComputation() throws IOException {		
+	public List<JavaClass> doAllMetricsComputation() throws IOException {		
 		//When possible, the following metrics are applied just on one single release (i.e. the release as attribute of JavaClass element)
 		
 		computeSize();	//Size = lines of code (LOC) in the class
 		computeNR();	//NR = number of commits that have modified the class
 		computeNAuth();	//NAuth = number of authors of the class
 		computeLocAndChurn();
+		/* LocAdded = sum of number of added LOC in all the commit of the given release
+		 * MaxLocAdded = max number of added LOC in all the commit of the given release
+		 * AvgLocAdded = average number of added LOC in all the commit of the given release
+		 * Churn = sum of |number of added LOC - number of deleted LOC| in all the commit of the given release
+		 * MaxChurn = max |number of added LOC - number of deleted LOC| in all the commit of the given release
+		 * Churn = average of |number of added LOC - number of deleted LOC| in all the commit of the given release */
+		
+		return this.javaClassesList;
 		
 	}
 

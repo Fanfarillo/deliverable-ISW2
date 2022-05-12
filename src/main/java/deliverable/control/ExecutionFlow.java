@@ -40,13 +40,17 @@ public class ExecutionFlow {
 		retGitInfo.getRelClassesAssociations(relCommAssociationsList);
 		List<JavaClass> javaClassesList = retGitInfo.labelClasses(relCommAssociationsList);
 		retGitInfo.assignCommitsToClasses(javaClassesList, allCommitsList, relCommAssociationsList);
-		List<JavaClass> currentJavaClassesList = retGitInfo.getCurrentClasses(allCommitsList);
-		//It's comfortable to work with a unified list
-		//Training set and testing set will be distinguishable through the name of the attribute Release of JavaClasses: in case of instances of testing set, this name is null
-		javaClassesList.addAll(currentJavaClassesList);
+		
+		// List<JavaClass> currentJavaClassesList = retGitInfo.getCurrentClasses(allCommitsList);	idk if it is necessary
+		// ??? It's comfortable to work with a unified list
+		// ??? Training set and testing set will be distinguishable through the name of the attribute Release of JavaClasses: in case of instances of testing set, this name is null
+		// javaClassesList.addAll(currentJavaClassesList);	idk if it is necessary
 		
 		ComputeMetrics computeMetrics = new ComputeMetrics(retGitInfo, javaClassesList);
-		computeMetrics.doAllMetricsComputation();	//DO NOT FORGET RETURN VALUE!!
+		javaClassesList = computeMetrics.doAllMetricsComputation();
+		
+		CreateCsv createCsv = new CreateCsv(projName, javaClassesList);
+		createCsv.writeOnCsv();
 		
 	}
 

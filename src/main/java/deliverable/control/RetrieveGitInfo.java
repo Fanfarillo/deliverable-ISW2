@@ -19,8 +19,6 @@ import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
-import org.eclipse.jgit.errors.CorruptObjectException;
-import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -304,9 +302,6 @@ public class RetrieveGitInfo {
 	
 	public void computeAddedAndDeletedLinesList(JavaClass javaClass) throws IOException {
 		
-		List<Integer> addedLinesList = new ArrayList<>();	
-		List<Integer> deletedLinesList = new ArrayList<>();
-		
 		for(RevCommit comm : javaClass.getCommits()) {		
 			try(DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
 				
@@ -318,9 +313,8 @@ public class RetrieveGitInfo {
 				List<DiffEntry> diffs = diffFormatter.scan(parentComm.getTree(), comm.getTree());
 				for(DiffEntry entry : diffs) {
 					if(entry.getNewPath().equals(javaClass.getName())) {
-						getAddedLines(diffFormatter, entry);
-						getDeletedLines(diffFormatter, entry);
-						//ADD THESE VALUES IN LISTS BUT BE CAREFUL IN HOW
+						javaClass.getAddedLinesList().add(getAddedLines(diffFormatter, entry));
+						javaClass.getDeletedLinesList().add(getDeletedLines(diffFormatter, entry));
 						
 					}
 					
@@ -332,6 +326,7 @@ public class RetrieveGitInfo {
 			}
 			
 		}
+		
 		
 	}
 

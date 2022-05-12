@@ -16,6 +16,15 @@ public class JavaClass {
 	private int size;
 	private int nr;
 	private int nAuth;
+	private int locAdded;
+	private int maxLocAdded;
+	private double avgLocAdded;
+	private int churn;
+	private int maxChurn;
+	private double avgChurn;
+	
+	private List<Integer> addedLinesList;
+	private List<Integer> deletedLinesList;
 	
 	public JavaClass(String name, String content, Release release) {
 		this.name = name;
@@ -27,6 +36,15 @@ public class JavaClass {
 		this.size = 0;
 		this.nr = 0;
 		this.nAuth = 0;
+		this.locAdded = 0;
+		this.maxLocAdded = 0;
+		this.avgLocAdded = 0;
+		this.churn = 0;
+		this.maxChurn = 0;
+		this.avgChurn = 0;
+		
+		this.addedLinesList = new ArrayList<>();
+		this.deletedLinesList = new ArrayList<>();
 		
 	}
 
@@ -140,6 +158,118 @@ public class JavaClass {
 	 */
 	public void setnAuth(int nAuth) {
 		this.nAuth = nAuth;
+	}
+
+	/**
+	 * @return the locAdded
+	 */
+	public int getLocAdded() {
+		return locAdded;
+	}
+
+	/**
+	 * @param locAdded the locAdded to set
+	 */
+	public void setLocAdded(int locAdded) {
+		this.locAdded = locAdded;
+	}
+
+	/**
+	 * @return the maxLocAdded
+	 */
+	public int getMaxLocAdded() {
+		return maxLocAdded;
+	}
+
+	/**
+	 * @param maxLocAdded the maxLocAdded to set
+	 */
+	public void setMaxLocAdded(int maxLocAdded) {
+		this.maxLocAdded = maxLocAdded;
+	}
+
+	/**
+	 * @return the avgLocAdded
+	 */
+	public double getAvgLocAdded() {
+		return avgLocAdded;
+	}
+
+	/**
+	 * @param avgLocAdded the avgLocAdded to set
+	 */
+	public void setAvgLocAdded(double avgLocAdded) {
+		this.avgLocAdded = avgLocAdded;
+	}
+
+	/**
+	 * @return the churn
+	 */
+	public int getChurn() {
+		return churn;
+	}
+
+	/**
+	 * @param churn the churn to set
+	 */
+	public void setChurn(int churn) {
+		this.churn = churn;
+	}
+
+	/**
+	 * @return the maxChurn
+	 */
+	public int getMaxChurn() {
+		return maxChurn;
+	}
+
+	/**
+	 * @param maxChurn the maxChurn to set
+	 */
+	public void setMaxChurn(int maxChurn) {
+		this.maxChurn = maxChurn;
+	}
+
+	/**
+	 * @return the avgChurn
+	 */
+	public double getAvgChurn() {
+		return avgChurn;
+	}
+
+	/**
+	 * @param avgChurn the avgChurn to set
+	 */
+	public void setAvgChurn(double avgChurn) {
+		this.avgChurn = avgChurn;
+	}
+
+	/**
+	 * @return the addedLinesList
+	 */
+	public List<Integer> getAddedLinesList() {
+		return addedLinesList;
+	}
+
+	/**
+	 * @param addedLinesList the addedLinesList to set
+	 */
+	public void setAddedLinesList(List<Integer> addedLinesList) {
+		this.addedLinesList = addedLinesList;
+	}
+
+	/**
+	 * @return the deletedLinesList
+	 */
+	public List<Integer> getDeletedLinesList() {
+		return deletedLinesList;
+	}
+
+	/**
+	 * @param deletedLinesList the deletedLinesList to set
+	 */
+	public void setDeletedLinesList(List<Integer> deletedLinesList) {
+		this.deletedLinesList = deletedLinesList;
 	}
 
 }

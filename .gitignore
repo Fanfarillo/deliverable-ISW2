@@ -1,2 +1,5 @@
 # Maven
 target/
+
+# Output files
+*.csv
