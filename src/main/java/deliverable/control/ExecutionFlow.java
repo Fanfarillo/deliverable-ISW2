@@ -9,6 +9,7 @@ import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.json.JSONException;
 
+import deliverable.files.JavaClassesMetrics;
 import deliverable.model.JavaClass;
 import deliverable.model.Release;
 import deliverable.model.ReleaseCommits;
@@ -51,8 +52,8 @@ public class ExecutionFlow {
 		javaClassesList = computeMetrics.doAllMetricsComputation();
 		List<JavaClass> remJavaClassesList = JavaClassUtil.cutHalfReleases(javaClassesList, releasesList);
 		
-		CreateCsv createCsv = new CreateCsv(projName, remJavaClassesList);
-		createCsv.writeOnCsv();
+		JavaClassesMetrics classesMetrics = new JavaClassesMetrics(projName, remJavaClassesList);
+		classesMetrics.writeOnCsv();
 		
 	}
 

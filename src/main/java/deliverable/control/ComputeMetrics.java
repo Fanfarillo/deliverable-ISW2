@@ -82,10 +82,10 @@ public class ComputeMetrics {
 		}
 		
 		//If a class has 0 revisions, its AvgLocAdded and AvgChurn are 0 (see initialization above).
-		if(javaClass.getAddedLinesList().size() != 0) {		 
+		if(!javaClass.getAddedLinesList().isEmpty()) {		 
 			avgLOC = 1.0*sumLOC/javaClass.getAddedLinesList().size();
 		}
-		if(javaClass.getAddedLinesList().size() != 0) {
+		if(!javaClass.getAddedLinesList().isEmpty()) {
 			avgChurn = 1.0*churn/javaClass.getAddedLinesList().size();
 		}
 		
