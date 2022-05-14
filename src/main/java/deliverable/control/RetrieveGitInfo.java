@@ -62,6 +62,7 @@ public class RetrieveGitInfo {
 		
 	}
 	
+	/*This method retrieves all commits of all branches of the project repository*/
 	public List<RevCommit> retrieveAllCommits() throws GitAPIException, RevisionSyntaxException, IOException {
 		
 		List<RevCommit> allCommitsList = new ArrayList<>();		
@@ -83,6 +84,8 @@ public class RetrieveGitInfo {
 		
 	}
 	
+	/*This method returns a list of ReleaseCommits instances. Each instance associates a release with all the commits related to that release,
+	 * and specifies the last commit in temporal order*/
 	public List<ReleaseCommits> getRelCommAssociations(List<RevCommit> allCommitsList) throws ParseException {
 		
 		List<ReleaseCommits> relCommAssociations = new ArrayList<>();
@@ -121,6 +124,8 @@ public class RetrieveGitInfo {
 		
 	}
 	
+	/*This method, for each ReleaseCommits instance (i.e. for each release), retrieves all the classes that were present in project repository
+	 * on release date, and then sets these classes as attribute of the instance*/
 	public void getRelClassesAssociations(List<ReleaseCommits> relCommAssociations) throws IOException {
 		
 		for(ReleaseCommits relComm : relCommAssociations) {
@@ -133,8 +138,8 @@ public class RetrieveGitInfo {
 	
 	private List<RevCommit> getTicketCommits(Ticket ticket) throws GitAPIException, IOException {
 		
-		//Here there will be the commits related to the tickets involving the affected versions of ticket
-		//Commits have a ticket ID included in their comments (full messages)
+		//Here there will be the commits involving the affected versions of ticket
+		//Commits have a ticket ID included in their comment (full message)
 		List<RevCommit> associatedCommits = new ArrayList<>();
 		List<Ref> branchesList = this.git.branchList().setListMode(ListMode.ALL).call();
 
@@ -195,6 +200,11 @@ public class RetrieveGitInfo {
 		
 	}
 	
+	/*This function:
+	 * - Retrieves the commits associated with the specified ticket through the getTicketCommits function (remember that we are looping on the tickets)
+	 * - For each commit, retrieves the associated release and the modified classes through the getReleaseOfCommit and getModifiedClasses functions
+	 * - For each class modified by a commit, labels it as buggy in all the releases between the IV of the ticket and the release related to that commit
+	 * 	 through the updateJavaClassBuggyness function*/
 	private void doLabeling(List<JavaClass> javaClasses, Ticket ticket, List<ReleaseCommits> relCommAssociations) throws GitAPIException, IOException {
 		
 		List<RevCommit> commitsAssociatedWIssue = getTicketCommits(ticket);
@@ -212,6 +222,13 @@ public class RetrieveGitInfo {
 		
 	}
 	
+	/*The purpose of this method is to return a list of JavaClass instances with:
+	 * - Class name
+	 * - Class content
+	 * - Release
+	 * - Binary value "isBuggy"
+	 * The buildAllJavaClasses function instantiates the JavaClass instances and determines class names, class contents and releases.
+	 * On the other hand, the doLabeling function determines if the value of "isBuggy" is true or false*/
 	public List<JavaClass> labelClasses(List<ReleaseCommits> relCommAssociations) throws GitAPIException, IOException {
 		
 		List<JavaClass> javaClasses = JavaClassUtil.buildAllJavaClasses(relCommAssociations);
@@ -224,6 +241,8 @@ public class RetrieveGitInfo {
 		
 	}
 	
+	/*This method, for each JavaClass instance, retrieves a list of ALL the commits (not only the ones associated with some ticket) that have modified
+	 * the specified class for the specified release (class and release are JavaClass attributes)*/
 	public void assignCommitsToClasses(List<JavaClass> javaClasses, List<RevCommit> commits, List<ReleaseCommits> relCommAssociations) throws IOException {	
 		
 		for(RevCommit commit : commits) {
@@ -247,8 +266,8 @@ public class RetrieveGitInfo {
 		//allCommits is a useful parameter: it allows to get the commits AFTER the last release without doing new computations with Jgit
 		
 		/*We need to call getCommitsOfRelease method of ReleaseCommitsUtil class in order to get:
-		 * The commits after the last release
-		 * Current commit
+		 * - The commits after the last release
+		 * - Current commit
 		 * To do this, we need to retrieve the date of the last release and to create a new Release instance (that will be related to the next release) */
 		
 		Release lastRelease = ReleaseUtil.getLastRelease(this.releases);
@@ -300,6 +319,10 @@ public class RetrieveGitInfo {
 		
 	}
 	
+	/*This method initializes two lists:
+	 * - List of numbers of added lines by each commit; every entry is associated to one specific commit
+	 * - List of numbers of deleted lines by each commit; every entry is associated to one specific commit
+	 * These lists will be used to calculate sum, max & avg*/
 	public void computeAddedAndDeletedLinesList(JavaClass javaClass) throws IOException {
 		
 		for(RevCommit comm : javaClass.getCommits()) {		
@@ -321,7 +344,7 @@ public class RetrieveGitInfo {
 				}
 			
 			} catch(ArrayIndexOutOfBoundsException e) {
-			//commit has no parents: skip this commit, return an empty list and go on
+				//commit has no parents: skip this commit, return an empty list and go on
 			
 			}
 			

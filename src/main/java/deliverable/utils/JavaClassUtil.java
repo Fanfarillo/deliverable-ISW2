@@ -17,6 +17,8 @@ public class JavaClassUtil {
 		throw new IllegalStateException("This class does not have to be instantiated.");
 	}
 	
+	/*Callers:
+	 * labelClasses (RetrieveGitInfo)*/
 	public static List<JavaClass> buildAllJavaClasses(List<ReleaseCommits> relCommAssociations) {
 		
 		List<JavaClass> javaClasses = new ArrayList<>();
@@ -32,8 +34,10 @@ public class JavaClassUtil {
 		
 	}
 	
-	//fv is related to the single commit, not to the ticket
+	/*Callers:
+	 * doLabeling (RetrieveGitInfo)*/
 	public static void updateJavaClassBuggyness(List<JavaClass> javaClasses, String className, Release iv, Release fv) {
+		//fv is related to the single commit, not to the ticket
 		
 		for(JavaClass javaClass : javaClasses) {
 			//if javaClass has been modified by commit (that is className) and is related to a version v such that iv <= v < fv, then javaClass is buggy
@@ -46,6 +50,8 @@ public class JavaClassUtil {
 		
 	}
 	
+	/*Callers:
+	 * assignCommitsToClasses (RetrieveGitInfo)*/
 	public static void updateJavaClassCommits(List<JavaClass> javaClasses, String className, Release associatedRelease, RevCommit commit) {
 		
 		for(JavaClass javaClass : javaClasses) {
@@ -59,6 +65,8 @@ public class JavaClassUtil {
 		
 	}
 	
+	/*Callers:
+	 * collectData (ExecutionFlow)*/
 	public static List<JavaClass> cutHalfReleases(List<JavaClass> javaClassesList, List<Release> releasesList) {
 		
 		List<JavaClass> remainingJavaClasses = new ArrayList<>();

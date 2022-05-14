@@ -29,9 +29,11 @@ public class RetrieveJiraInfo {
 		this.projKey = projName.toUpperCase();
 	}
 	
+	/*This method retrieves all the versions of the project (Avro or Bookkeeper) that are released and with a release date*/
 	public List<Release> retrieveReleases() throws JSONException, IOException, ParseException {
 		
-		Map<Date, String> unsortedReleasesMap = new HashMap<>();
+		//The HashMap is a support to instantiate Release objects
+		Map<Date, String> unsortedReleasesMap = new HashMap<>();	//Date = release date; String = release name (e.g. 1.4.2)
 		List<Release> releasesList = new ArrayList<>();
 		
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -71,6 +73,8 @@ public class RetrieveJiraInfo {
 		
 	}
 	
+	/*This function collects key, opening version, fixed version and registered affected versions of a specific issue; then it uses this information
+	 * to create a new Ticket instance that will be added into ticketsList*/
 	private static Ticket createTicketInstance(Integer i, JSONArray issues, List<Release> releasesList) throws ParseException {
 		
 		Ticket ticket = null;
@@ -112,6 +116,8 @@ public class RetrieveJiraInfo {
         
 	}
 	
+	/*This method retrieves all the fixed bugs of the project with their key (e.g. AVRO-536:), their opening version, their fixed version
+	 * and their registered affected versions*/
 	public List<Ticket> retrieveIssues(List<Release> releasesList) throws JSONException, IOException, ParseException {
 		
 		List<Ticket> ticketsList = new ArrayList<>();
@@ -150,6 +156,13 @@ public class RetrieveJiraInfo {
 	    
 	}
 	
+	/*This method takes in input all the tickets of a project and selects the ones resulting consistent.
+	 * Consistent issues have:
+	 * - Available affected versions (i.e. affected versions not null)
+	 * - Affected versions that do not succeed fixed version
+	 * - Opening version that is marked as affected
+	 * Consecutive affected versions are not considered mandatory. By consequence, this method calls adjustTicket to fill eventual missing
+	 * affected version between the initial affected version and the previous version of fixed version*/
 	public List<Ticket> retrieveConsistentIssues(List<Ticket> ticketsList, List<Release> releasesList) {
 		
 		List<Ticket> consistentIssues = new ArrayList<>();
@@ -187,6 +200,8 @@ public class RetrieveJiraInfo {
 		
 	}
 	
+	/*This method retrieves all the issues resulting inconsistent and sets opportunely their AV list using the (cold start) proportion technique
+	 * and, in particular, using value P computed in computeProportion function of ColdStart class*/
 	public List<Ticket> adjustTicketsList(List<Ticket> ticketsList, List<Ticket> consistentTicketsList, List<Release> releasesList, Double p) {
 		
 		List<Ticket> inconsistentTicketsList = retrieveInconsistentTicketsList(ticketsList, consistentTicketsList);

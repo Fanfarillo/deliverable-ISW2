@@ -10,7 +10,7 @@ public class ReleaseCommits {
 	private Release release;
 	private List<RevCommit> commits;
 	private RevCommit lastCommit;
-	private Map<String, String> javaClasses;
+	private Map<String, String> javaClasses;  //Classes that were present when the release was deployed; they are represented by their name and their content
 	
 	public ReleaseCommits(Release release, List<RevCommit> commits, RevCommit lastCommit) {
 		this.release = release;

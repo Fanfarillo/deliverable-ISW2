@@ -44,7 +44,7 @@ public class ExecutionFlow {
 		retGitInfo.assignCommitsToClasses(javaClassesList, allCommitsList, relCommAssociationsList);
 		
 		// List<JavaClass> currentJavaClassesList = retGitInfo.getCurrentClasses(allCommitsList);	idk if it is necessary
-		// ??? It's comfortable to work with a unified list
+		// ??? It is comfortable to work with a unified list
 		// ??? Training set and testing set will be distinguishable through the name of the attribute Release of JavaClasses: in case of instances of testing set, this name is null
 		// javaClassesList.addAll(currentJavaClassesList);	idk if it is necessary
 		

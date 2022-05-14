@@ -13,6 +13,8 @@ public class TicketUtil {
 		throw new IllegalStateException("This class does not have to be instantiated.");
 	}
 	
+	/*Callers:
+	 * retrieveConsistentIssues (RetrieveJiraInfo)*/
 	public static boolean isConsistentTicket(Ticket ticket) {
 		
 		boolean isOVaffected = false;
@@ -39,11 +41,14 @@ public class TicketUtil {
 		
 	}
 	
+	/*Callers:
+	 * retrieveConsistentIssues (RetrieveJiraInfo)
+	 * adjustTicketsList (RetrieveJiraInfo)*/
 	public static Ticket adjustTicket(Ticket ticket, List<Release> releasesList) {
 		
 		List<Release> newAV = new ArrayList<>();
 		
-		ticket.setIv(ticket.getAv().get(0));
+		ticket.setIv(ticket.getAv().get(0));	//Obviously the injected version is the first affected version
 		
 		//Affected versions have to be from IV (=the earliest AV) to FV-1
 		for(int i=ticket.getIv().getId(); i<ticket.getFv().getId(); i++) {
@@ -61,6 +66,8 @@ public class TicketUtil {
 		
 	}
 	
+	/*Callers:
+	 * adjustTicketsList (RetrieveJiraInfo)*/
 	public static Ticket setInitialAV(Ticket ticket, List<Release> releasesList, Double p) {
 		
 		List<Release> initialAV = new ArrayList<>();

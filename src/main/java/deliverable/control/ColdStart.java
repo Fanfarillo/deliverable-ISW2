@@ -13,6 +13,7 @@ import deliverable.model.Ticket;
 
 public class ColdStart {
 	
+	/*This method retrieves all consistent issues of the following projects: Falcon, Ivy, Openjpa, Storm, Tajo*/
 	public List<Ticket> retrieveOtherConsistentIssues() throws JSONException, IOException, ParseException {
 		
 		List<Ticket> allConsistentTickets = new ArrayList<>();
@@ -39,7 +40,7 @@ public class ColdStart {
 		for(Ticket issue : issues) {
 			//P = (FV-IV)/(FV-OV)
 			Double prop = (1.0)*(issue.getFv().getId()-issue.getIv().getId())/(issue.getFv().getId()-issue.getOv().getId());
-			if(prop >= 1.0) {
+			if(prop >= 1.0) {	//P cannot be less than 1
 				proportions.add(prop);
 			}
 			
