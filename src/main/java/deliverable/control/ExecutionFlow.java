@@ -1,16 +1,13 @@
 package deliverable.control;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.List;
 
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.json.JSONException;
 
 import deliverable.enums.CsvNamesEnum;
 import deliverable.files.LabelingFile;
+import deliverable.model.ClassifierEvaluation;
 import deliverable.model.JavaClass;
 import deliverable.model.Release;
 import deliverable.model.ReleaseCommits;
@@ -26,18 +23,18 @@ public class ExecutionFlow {
 		throw new IllegalStateException("This class does not have to be instantiated.");
 	}
 	
-	private static void writeCsvPerRelease(String projName, List<JavaClass> javaClassesList, int lastReleaseID) throws IOException {
+	private static void writeCsvPerRelease(String projName, List<JavaClass> javaClassesList, int lastReleaseIdIter) throws IOException {
 		
-		for(int i=2; i<=lastReleaseID; i++) {	//In the first iteration of walk forward, testing set is composed of second release classes
+		for(int i=2; i<=lastReleaseIdIter; i++) {	//In the first iteration of walk forward, testing set is composed of second release classes
 			List<JavaClass> iterJavaClassesList = JavaClassUtil.filterJavaClassesByRelease(javaClassesList, i);			
 			LabelingFile labelingTesting = new LabelingFile(projName, CsvNamesEnum.TESTING, i-1, iterJavaClassesList);
-			labelingTesting.writeOnCsv();
+			labelingTesting.writeOnArff(true);	//"true" indicates that csv file will be deleted and only arff file will remain
 			
 		}
 		
 	}
 	
-	public static void collectData(String projName) throws JSONException, IOException, ParseException, RevisionSyntaxException, GitAPIException {
+	public static void collectData(String projName) throws Exception {
 		
 		RetrieveJiraInfo retJiraInfo = new RetrieveJiraInfo(projName);
 		List<Release> releasesList = retJiraInfo.retrieveReleases();
@@ -94,13 +91,16 @@ public class ExecutionFlow {
 				}
 				else {
 					LabelingFile labelingTraining = new LabelingFile(projName, CsvNamesEnum.TRAINING, i, javaClassesList);
-					labelingTraining.writeOnCsv();
+					labelingTraining.writeOnArff(true);		//"true" indicates that csv file will be deleted and only arff file will remain
 					
 				}
 								
 			}
 			
 		}
+		
+		RetrieveWekaInfo retWekaInfo = new RetrieveWekaInfo(projName, (lastReleaseID/2)-1);
+		List<ClassifierEvaluation> classifiersEvaluation = retWekaInfo.retrieveClassifiersEvaluation();
 		
 	}
 

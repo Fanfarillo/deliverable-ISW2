@@ -1,6 +1,8 @@
 package deliverable.files;
 
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -31,12 +33,12 @@ public class LabelingFile {
 	
 	private String enumToString() {
 		
-		switch(this.csvName) {
+		switch(csvName) {
 		
 		case TRAINING:
-			return "_TR" + this.csvIndex;
+			return "_TR" + csvIndex;
 		case TESTING:
-			return "_TE" + this.csvIndex;
+			return "_TE" + csvIndex;
 		case BUGGY:
 			return "_buggy_classes";
 		case CURRENT:
@@ -48,13 +50,14 @@ public class LabelingFile {
 		
 	}
 	
-	public void writeOnCsv() throws IOException {
-		
-		String csvNameStr = enumToString();		
+	public Sheet writeOnCsv() throws IOException {
+			
+		Sheet sheet;
+		String csvNameStr = enumToString();
 		Workbook wb = new HSSFWorkbook();
 		
 		try(OutputStream os = new FileOutputStream(this.projName + csvNameStr + ".csv")) {
-			Sheet sheet = wb.createSheet(this.projName);
+			sheet = wb.createSheet(this.projName);
                 
 	        for(int i=-1; i<this.javaClassesList.size(); i++) {
 	        	Row row = sheet.createRow(i+1);		//i = row index - 1
@@ -73,7 +76,7 @@ public class LabelingFile {
     	        Cell cell11 = row.createCell(11);
 
 	        	if(i==-1) {	        		
-	    	        cell0.setCellValue("CLASS");
+	    	        cell0.setCellValue("JAVA_CLASS");
 	    	        cell1.setCellValue("RELEASE");
 	    	        cell2.setCellValue("SIZE");
 	    	        cell3.setCellValue("NR");
@@ -106,6 +109,53 @@ public class LabelingFile {
 	        }	        
 	        wb.write(os);	//Write on file Excel
 			
+		}
+		return sheet;
+		
+	}
+	
+	public void writeOnArff(boolean deleteCsv) throws IOException {
+		
+		String csvNameStr = enumToString();
+		Sheet sheet = writeOnCsv();		
+		FileWriter wr = new FileWriter(this.projName + csvNameStr + ".arff");
+		
+		wr.write("@relation " + this.projName + csvNameStr + "\n");
+		wr.write("@attribute SIZE numeric\n");
+		wr.write("@attribute NR numeric\n");
+		wr.write("@attribute N_AUTH numeric\n");
+		wr.write("@attribute LOC_ADDED numeric\n");
+		wr.write("@attribute MAX_LOC_ADDED numeric\n");
+		wr.write("@attribute AVG_LOC_ADDED numeric\n");
+		wr.write("@attribute CHURN numeric\n");
+		wr.write("@attribute MAX_CHURN numeric\n");
+		wr.write("@attribute AVG_CHURN numeric\n");
+		wr.write("@attribute IS_BUGGY {'true', 'false'}\n");
+		wr.write("@data\n");
+		
+		for (int r=1; r<=sheet.getLastRowNum(); r++){
+			Row row = sheet.getRow(r);
+			
+			Double val2 = row.getCell(2).getNumericCellValue();
+			Double val3 = row.getCell(3).getNumericCellValue();
+			Double val4 = row.getCell(4).getNumericCellValue();
+			Double val5 = row.getCell(5).getNumericCellValue();
+			Double val6 = row.getCell(6).getNumericCellValue();
+			Double val7 = row.getCell(7).getNumericCellValue();
+			Double val8 = row.getCell(8).getNumericCellValue();
+			Double val9 = row.getCell(9).getNumericCellValue();
+			Double val10 = row.getCell(10).getNumericCellValue();
+			Boolean val11 = row.getCell(11).getBooleanCellValue();
+			
+			wr.write(val2.toString() + "," + val3.toString() + "," + val4.toString() + "," + val5.toString() + "," + val6.toString() + "," +
+					val7.toString() + "," + val8.toString() + "," + val9.toString() + "," + val10.toString() + "," + val11.toString() + "\n");
+			
+		}
+		wr.close();
+		
+		if(deleteCsv) {
+			File csvFile = new File(this.projName + csvNameStr + ".csv");
+			csvFile.delete();
 		}
 		
 	}
