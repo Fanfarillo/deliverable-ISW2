@@ -1,5 +1,6 @@
 package deliverable.utils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +42,9 @@ public class ReleaseUtil {
 	}
 	
 	/*Callers:
-	 * cutHalfReleases (JavaClassUtil)*/
+	 * cutHalfReleases (JavaClassUtil)
+	 * collectData (ExecutionFlow)
+	 * getCurrentClasses (RetrieveGitInfo)*/
 	public static Release getLastRelease(List<Release> releasesList) {
 		
 		Release lastRelease = releasesList.get(0);
@@ -54,6 +57,23 @@ public class ReleaseUtil {
 		}
 		return lastRelease;
 			
+	}
+	
+	/*Callers:
+	 * collectData (ExecutionFlow)*/
+	public static List<Release> getFirstReleases(List<Release> releasesList, int maxReleaseID) {
+		
+		List<Release> firstReleases = new ArrayList<>();
+		
+		for(Release rel : releasesList) {
+			if(rel.getId() <= maxReleaseID) {
+				firstReleases.add(rel);
+				
+			}
+			
+		}
+		return firstReleases;
+		
 	}
 	
 }

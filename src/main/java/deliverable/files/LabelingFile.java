@@ -11,29 +11,53 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import deliverable.enums.CsvNamesEnum;
 import deliverable.model.JavaClass;
 
-public class JavaClassesMetrics {
+public class LabelingFile {
 	
 	private String projName;
+	private CsvNamesEnum csvName;
+	private int csvIndex;
 	private List<JavaClass> javaClassesList;
 	
-	public JavaClassesMetrics(String projName, List<JavaClass> javaClassesList) {
+	public LabelingFile(String projName, CsvNamesEnum csvName, int csvIndex, List<JavaClass> javaClassesList) {
 		this.projName = projName;
+		this.csvName = csvName;
+		this.csvIndex = csvIndex;
 		this.javaClassesList = javaClassesList;
+		
+	}
+	
+	private String enumToString() {
+		
+		switch(this.csvName) {
+		
+		case TRAINING:
+			return "_TR" + this.csvIndex;
+		case TESTING:
+			return "_TE" + this.csvIndex;
+		case BUGGY:
+			return "_buggy_classes";
+		case CURRENT:
+			return "_current_classes";
+		default:
+			return null;
+		
+		}
 		
 	}
 	
 	public void writeOnCsv() throws IOException {
 		
+		String csvNameStr = enumToString();		
 		Workbook wb = new HSSFWorkbook();
 		
-		try(OutputStream os = new FileOutputStream("Buggy_classes_" + this.projName + ".csv")) {
+		try(OutputStream os = new FileOutputStream(this.projName + csvNameStr + ".csv")) {
 			Sheet sheet = wb.createSheet(this.projName);
-        
-	        int i=0;	//Row index	        
-	        for(JavaClass javaClass : this.javaClassesList) {
-	        	Row row = sheet.createRow(i);
+                
+	        for(int i=-1; i<this.javaClassesList.size(); i++) {
+	        	Row row = sheet.createRow(i+1);		//i = row index - 1
 	        	
 	        	Cell cell0 = row.createCell(0);
 	        	Cell cell1 = row.createCell(1);
@@ -48,7 +72,7 @@ public class JavaClassesMetrics {
     	        Cell cell10 = row.createCell(10);
     	        Cell cell11 = row.createCell(11);
 
-	        	if(i==0) {	        		
+	        	if(i==-1) {	        		
 	    	        cell0.setCellValue("CLASS");
 	    	        cell1.setCellValue("RELEASE");
 	    	        cell2.setCellValue("SIZE");
@@ -64,22 +88,20 @@ public class JavaClassesMetrics {
 	        		
 	        	}
 	        	else {		        	
-		        	cell0.setCellValue(javaClass.getName());
-		        	cell1.setCellValue(javaClass.getRelease().getId());
-		        	cell2.setCellValue(javaClass.getSize());
-		        	cell3.setCellValue(javaClass.getNr());
-		        	cell4.setCellValue(javaClass.getnAuth());
-		        	cell5.setCellValue(javaClass.getLocAdded());
-		        	cell6.setCellValue(javaClass.getMaxLocAdded());
-		        	cell7.setCellValue(javaClass.getAvgLocAdded());
-		        	cell8.setCellValue(javaClass.getChurn());
-		        	cell9.setCellValue(javaClass.getMaxChurn());
-		        	cell10.setCellValue(javaClass.getAvgChurn());
-		        	cell11.setCellValue(javaClass.isBuggy());
+		        	cell0.setCellValue(this.javaClassesList.get(i).getName());
+		        	cell1.setCellValue(this.javaClassesList.get(i).getRelease().getId());
+		        	cell2.setCellValue(this.javaClassesList.get(i).getSize());
+		        	cell3.setCellValue(this.javaClassesList.get(i).getNr());
+		        	cell4.setCellValue(this.javaClassesList.get(i).getnAuth());
+		        	cell5.setCellValue(this.javaClassesList.get(i).getLocAdded());
+		        	cell6.setCellValue(this.javaClassesList.get(i).getMaxLocAdded());
+		        	cell7.setCellValue(this.javaClassesList.get(i).getAvgLocAdded());
+		        	cell8.setCellValue(this.javaClassesList.get(i).getChurn());
+		        	cell9.setCellValue(this.javaClassesList.get(i).getMaxChurn());
+		        	cell10.setCellValue(this.javaClassesList.get(i).getAvgChurn());
+		        	cell11.setCellValue(this.javaClassesList.get(i).isBuggy());
 	        		
 	        	}	    
-	        	
-	        	i++;
 	        	
 	        }	        
 	        wb.write(os);	//Write on file Excel

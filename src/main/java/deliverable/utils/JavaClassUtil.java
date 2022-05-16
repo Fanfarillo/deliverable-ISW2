@@ -18,7 +18,8 @@ public class JavaClassUtil {
 	}
 	
 	/*Callers:
-	 * labelClasses (RetrieveGitInfo)*/
+	 * labelClasses (RetrieveGitInfo)
+	 * getCurrentClasses (RetrieveGitInfo)*/
 	public static List<JavaClass> buildAllJavaClasses(List<ReleaseCommits> relCommAssociations) {
 		
 		List<JavaClass> javaClasses = new ArrayList<>();
@@ -51,7 +52,8 @@ public class JavaClassUtil {
 	}
 	
 	/*Callers:
-	 * assignCommitsToClasses (RetrieveGitInfo)*/
+	 * assignCommitsToClasses (RetrieveGitInfo)
+	 * getCurrentClasses (RetrieveGitInfo)*/
 	public static void updateJavaClassCommits(List<JavaClass> javaClasses, String className, Release associatedRelease, RevCommit commit) {
 		
 		for(JavaClass javaClass : javaClasses) {
@@ -78,6 +80,23 @@ public class JavaClassUtil {
 			
 		}
 		return remainingJavaClasses;
+		
+	}
+	
+	/*Callers:
+	 * writeCsvPerRelease (ExecutionFlow)*/
+	public static List<JavaClass> filterJavaClassesByRelease(List<JavaClass> javaClassesList, int releaseID) {
+		
+		List<JavaClass> remJavaClasses = new ArrayList<>();
+		
+		for(JavaClass javaClass : javaClassesList) {
+			if(javaClass.getRelease().getId() == releaseID) {
+				remJavaClasses.add(javaClass);
+				
+			}
+			
+		}
+		return remJavaClasses;
 		
 	}
 

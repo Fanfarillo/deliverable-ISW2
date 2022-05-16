@@ -32,7 +32,8 @@ public class ReleaseCommitsUtil {
 	}
 	
 	/*Callers:
-	 * getRelCommAssociations (RetrieveGitInfo)*/
+	 * getRelCommAssociations (RetrieveGitInfo)
+	 * getCurrentClasses (RetrieveGitInfo)*/
 	public static ReleaseCommits getCommitsOfRelease(List<RevCommit> commitsList, Release release, Date firstDate) {
 		
 		List<RevCommit> matchingCommits = new ArrayList<>();

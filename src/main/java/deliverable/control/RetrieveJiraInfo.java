@@ -159,7 +159,7 @@ public class RetrieveJiraInfo {
 	/*This method takes in input all the tickets of a project and selects the ones resulting consistent.
 	 * Consistent issues have:
 	 * - Available affected versions (i.e. affected versions not null)
-	 * - Affected versions that do not succeed fixed version
+	 * - Affected versions that do not succeed fixed version and are not equal to fixed version
 	 * - Opening version that is marked as affected
 	 * Consecutive affected versions are not considered mandatory. By consequence, this method calls adjustTicket to fill eventual missing
 	 * affected version between the initial affected version and the previous version of fixed version*/

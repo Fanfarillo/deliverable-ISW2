@@ -11,10 +11,15 @@ import deliverable.enums.ProjectsEnum;
 import deliverable.model.Release;
 import deliverable.model.Ticket;
 
-public class ColdStart {
+public class Proportion {
+	
+	//This private constructor is meant to hide the public one: classes with only static methods do not have to be instantiated.
+	private Proportion() {
+		throw new IllegalStateException("This class does not have to be instantiated.");
+	}
 	
 	/*This method retrieves all consistent issues of the following projects: Falcon, Ivy, Openjpa, Storm, Tajo*/
-	public List<Ticket> retrieveOtherConsistentIssues() throws JSONException, IOException, ParseException {
+	public static List<Ticket> coldStartRetrieveConsistentIssues() throws JSONException, IOException, ParseException {
 		
 		List<Ticket> allConsistentTickets = new ArrayList<>();
 		
@@ -32,7 +37,7 @@ public class ColdStart {
 		
 	}
 	
-	public Double computeProportion(List<Ticket> issues) {
+	public static Double computeProportion(List<Ticket> issues) {
 		
 		List<Double> proportions = new ArrayList<>();
 		

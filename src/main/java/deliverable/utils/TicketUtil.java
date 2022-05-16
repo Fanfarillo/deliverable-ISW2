@@ -89,5 +89,22 @@ public class TicketUtil {
 		return ticket;
 		
 	}
+	
+	/*Callers:
+	 * collectData (ExecutionFlow)*/
+	public static List<Ticket> getFirstTickets(List<Ticket> ticketsList, int maxFVid) {
+		
+		List<Ticket> firstTickets = new ArrayList<>();
+		
+		for(Ticket ticket : ticketsList) {
+			if(ticket.getFv().getId() <= maxFVid) {
+				firstTickets.add(ticket);
+				
+			}
+			
+		}
+		return firstTickets;
+		
+	}
 
 }
