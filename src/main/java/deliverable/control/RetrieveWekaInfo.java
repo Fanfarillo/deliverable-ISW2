@@ -50,13 +50,13 @@ public class RetrieveWekaInfo {
 			
 			RandomForest randomForestClassifier = new RandomForest();
 			NaiveBayes naiveBayesClassifier = new NaiveBayes();
-			IBk ibkClassifier = new IBk();
-			
-			Evaluation eval = new Evaluation(testing);	
+			IBk ibkClassifier = new IBk();	
 			
 			int numAttr = training.numAttributes();
 			training.setClassIndex(numAttr - 1);
 			testing.setClassIndex(numAttr - 1);
+			
+			Evaluation eval = new Evaluation(testing);
 
 			randomForestClassifier.buildClassifier(training);		
 			eval.evaluateModel(randomForestClassifier, testing);			

@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import deliverable.enums.CsvNamesEnum;
+import deliverable.files.EvaluationFile;
 import deliverable.files.LabelingFile;
 import deliverable.model.ClassifierEvaluation;
 import deliverable.model.JavaClass;
@@ -101,6 +102,9 @@ public class ExecutionFlow {
 		
 		RetrieveWekaInfo retWekaInfo = new RetrieveWekaInfo(projName, (lastReleaseID/2)-1);
 		List<ClassifierEvaluation> classifiersEvaluation = retWekaInfo.retrieveClassifiersEvaluation();
+		
+		EvaluationFile evaluationFile = new EvaluationFile(projName, classifiersEvaluation);
+		evaluationFile.reportEvaluationOnCsv();
 		
 	}
 

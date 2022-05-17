@@ -23,17 +23,31 @@ public class ClassifierEvaluationUtil {
 		double aucSum = 0;
 		double kappaSum = 0;
 		
+		int numAucAveraged = 0;
+		
 		for(ClassifierEvaluation evaluation : evaluationsList) {
+			Double currentAuc = evaluation.getAuc();
+			
 			precisionSum = precisionSum + evaluation.getPrecision();
 			recallSum = recallSum + evaluation.getRecall();
-			aucSum = aucSum + evaluation.getAuc();
 			kappaSum = kappaSum + evaluation.getKappa();
+			//There are also AUC equal to NaN (this happens when there are no positive instances in testing set)
+			if(!currentAuc.isNaN()) {		
+				aucSum = aucSum + evaluation.getAuc();
+				numAucAveraged++;
+			}
 			
 		}
 		avgEvaluation.setPrecision(precisionSum/evaluationsList.size());
 		avgEvaluation.setRecall(recallSum/evaluationsList.size());
-		avgEvaluation.setAuc(aucSum/evaluationsList.size());
 		avgEvaluation.setKappa(kappaSum/evaluationsList.size());
+		
+		if(numAucAveraged != 0) {
+			avgEvaluation.setAuc(aucSum/numAucAveraged);
+		}
+		else {
+			avgEvaluation.setAuc(0);
+		}		
 		
 		return avgEvaluation;
 		
