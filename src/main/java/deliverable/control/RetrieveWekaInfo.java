@@ -20,6 +20,10 @@ import weka.filters.supervised.instance.SpreadSubsample;
 
 public class RetrieveWekaInfo {
 	
+	private static final String RANDOM_FOREST = "Random Forest";
+	private static final String NAIVE_BAYES = "Naive Bayes";
+	private static final String IBK = "IBk";
+	
 	private String projName;
 	private int numIter;
 	
@@ -60,7 +64,7 @@ public class RetrieveWekaInfo {
 
 			randomForestClassifier.buildClassifier(training);		
 			eval.evaluateModel(randomForestClassifier, testing);			
-			ClassifierEvaluation simpleRandomForest = new ClassifierEvaluation(this.projName, i, "Random Forest", false, false);
+			ClassifierEvaluation simpleRandomForest = new ClassifierEvaluation(this.projName, i, RANDOM_FOREST, false, false);
 			simpleRandomForest.setPrecision(eval.precision(0));
 			simpleRandomForest.setRecall(eval.recall(0));
 			simpleRandomForest.setAuc(eval.areaUnderROC(0));
@@ -69,7 +73,7 @@ public class RetrieveWekaInfo {
 			
 			naiveBayesClassifier.buildClassifier(training);		
 			eval.evaluateModel(naiveBayesClassifier, testing);		
-			ClassifierEvaluation simpleNaiveBayes = new ClassifierEvaluation(this.projName, i, "Naive Bayes", false, false);
+			ClassifierEvaluation simpleNaiveBayes = new ClassifierEvaluation(this.projName, i, NAIVE_BAYES, false, false);
 			simpleNaiveBayes.setPrecision(eval.precision(0));
 			simpleNaiveBayes.setRecall(eval.recall(0));
 			simpleNaiveBayes.setAuc(eval.areaUnderROC(0));
@@ -78,7 +82,7 @@ public class RetrieveWekaInfo {
 			
 			ibkClassifier.buildClassifier(training);		
 			eval.evaluateModel(ibkClassifier, testing);
-			ClassifierEvaluation simpleIBk = new ClassifierEvaluation(this.projName, i, "IBk", false, false);
+			ClassifierEvaluation simpleIBk = new ClassifierEvaluation(this.projName, i, IBK, false, false);
 			simpleIBk.setPrecision(eval.precision(0));
 			simpleIBk.setRecall(eval.recall(0));
 			simpleIBk.setAuc(eval.areaUnderROC(0));
@@ -104,7 +108,7 @@ public class RetrieveWekaInfo {
 			
 			randomForestClassifier.buildClassifier(filteredTraining);		
 			eval.evaluateModel(randomForestClassifier, filteredTesting);
-			ClassifierEvaluation featureSelRandomForest = new ClassifierEvaluation(this.projName, i, "Random Forest", true, false);
+			ClassifierEvaluation featureSelRandomForest = new ClassifierEvaluation(this.projName, i, RANDOM_FOREST, true, false);
 			featureSelRandomForest.setPrecision(eval.precision(0));
 			featureSelRandomForest.setRecall(eval.recall(0));
 			featureSelRandomForest.setAuc(eval.areaUnderROC(0));
@@ -113,7 +117,7 @@ public class RetrieveWekaInfo {
 			
 			naiveBayesClassifier.buildClassifier(filteredTraining);		
 			eval.evaluateModel(naiveBayesClassifier, filteredTesting);
-			ClassifierEvaluation featureSelNaiveBayes = new ClassifierEvaluation(this.projName, i, "Naive Bayes", true, false);
+			ClassifierEvaluation featureSelNaiveBayes = new ClassifierEvaluation(this.projName, i, NAIVE_BAYES, true, false);
 			featureSelNaiveBayes.setPrecision(eval.precision(0));
 			featureSelNaiveBayes.setRecall(eval.recall(0));
 			featureSelNaiveBayes.setAuc(eval.areaUnderROC(0));
@@ -122,7 +126,7 @@ public class RetrieveWekaInfo {
 			
 			ibkClassifier.buildClassifier(filteredTraining);		
 			eval.evaluateModel(ibkClassifier, filteredTesting);
-			ClassifierEvaluation featureSelIBk = new ClassifierEvaluation(this.projName, i, "IBk", true, false);
+			ClassifierEvaluation featureSelIBk = new ClassifierEvaluation(this.projName, i, IBK, true, false);
 			featureSelIBk.setPrecision(eval.precision(0));
 			featureSelIBk.setRecall(eval.recall(0));
 			featureSelIBk.setAuc(eval.areaUnderROC(0));
@@ -141,7 +145,7 @@ public class RetrieveWekaInfo {
 			fc.setClassifier(randomForestClassifier);			
 			fc.buildClassifier(filteredTraining);
 			eval.evaluateModel(fc, filteredTesting);
-			ClassifierEvaluation samplingRandomForest = new ClassifierEvaluation(this.projName, i, "Random Forest", true, true);
+			ClassifierEvaluation samplingRandomForest = new ClassifierEvaluation(this.projName, i, RANDOM_FOREST, true, true);
 			samplingRandomForest.setPrecision(eval.precision(0));
 			samplingRandomForest.setRecall(eval.recall(0));
 			samplingRandomForest.setAuc(eval.areaUnderROC(0));
@@ -151,7 +155,7 @@ public class RetrieveWekaInfo {
 			fc.setClassifier(naiveBayesClassifier);			
 			fc.buildClassifier(filteredTraining);
 			eval.evaluateModel(fc, filteredTesting);
-			ClassifierEvaluation samplingNaiveBayes = new ClassifierEvaluation(this.projName, i, "Naive Bayes", true, true);
+			ClassifierEvaluation samplingNaiveBayes = new ClassifierEvaluation(this.projName, i, NAIVE_BAYES, true, true);
 			samplingNaiveBayes.setPrecision(eval.precision(0));
 			samplingNaiveBayes.setRecall(eval.recall(0));
 			samplingNaiveBayes.setAuc(eval.areaUnderROC(0));
@@ -161,7 +165,7 @@ public class RetrieveWekaInfo {
 			fc.setClassifier(ibkClassifier);			
 			fc.buildClassifier(filteredTraining);
 			eval.evaluateModel(fc, filteredTesting);
-			ClassifierEvaluation samplingIBk = new ClassifierEvaluation(this.projName, i, "IBk", true, true);
+			ClassifierEvaluation samplingIBk = new ClassifierEvaluation(this.projName, i, IBK, true, true);
 			samplingIBk.setPrecision(eval.precision(0));
 			samplingIBk.setRecall(eval.recall(0));
 			samplingIBk.setAuc(eval.areaUnderROC(0));
