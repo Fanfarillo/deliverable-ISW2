@@ -81,7 +81,7 @@ public class RetrieveJiraInfo {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		
         try {
-        	String key = (issues.getJSONObject(i%1000).get("key").toString()) + ":";
+        	String key = (issues.getJSONObject(i%1000).get("key").toString());       	
         	JSONObject fields = issues.getJSONObject(i%1000).getJSONObject("fields");
         	
         	String resolutionDateStr = fields.get("resolutiondate").toString();

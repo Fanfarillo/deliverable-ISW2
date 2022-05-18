@@ -152,7 +152,7 @@ public class RetrieveGitInfo {
 				String comment = commit.getFullMessage();	
 				
 				//We are keeping only commits related to Jira tickets previously found
-				if(comment.contains(ticket.getKey()) && !associatedCommits.contains(commit)) {	
+				if((comment.contains(ticket.getKey() + ":") || comment.contains(ticket.getKey() + "]") || comment.contains(ticket.getKey() + " ")) && !associatedCommits.contains(commit)) {	
 					associatedCommits.add(commit);
 				}				
 							
@@ -211,12 +211,17 @@ public class RetrieveGitInfo {
 		
 		for(RevCommit commit : commitsAssociatedWIssue) {
 			Release associatedRelease = ReleaseCommitsUtil.getReleaseOfCommit(commit, relCommAssociations);
-			List<String> modifiedClasses = getModifiedClasses(commit);
+			//associatedRelease can be null if commit date is after last release date; in that case we ignore the commit
+			//(it is trying to fix a issue that hypothetically should be already closed)
+			if(associatedRelease != null) {		
+				List<String> modifiedClasses = getModifiedClasses(commit);
 			
-			for(String modifClass : modifiedClasses) {
-				JavaClassUtil.updateJavaClassBuggyness(javaClasses, modifClass, ticket.getIv(), associatedRelease);
+				for(String modifClass : modifiedClasses) {
+					JavaClassUtil.updateJavaClassBuggyness(javaClasses, modifClass, ticket.getIv(), associatedRelease);
 				
-			}
+				}
+				
+			}	
 			
 		}
 		
