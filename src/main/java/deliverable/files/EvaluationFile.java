@@ -66,50 +66,49 @@ public class EvaluationFile {
 	    	        cell11.setCellValue("TP");
 	    	        cell12.setCellValue("FP");
 	    	        cell13.setCellValue("TN");
-	    	        cell14.setCellValue("FN");
-	        		
+	    	        cell14.setCellValue("FN");	    	        
+	    	        continue;	 
+	    	        
 	        	}
-	        	else {		        	
-	        		cell00.setCellValue(this.projName);
-	        		if(this.description == "details") {
-	        			cell01.setCellValue(this.evaluationsList.get(i).getWalkForwardIterationIndex());
-	        			cell02.setCellValue(this.evaluationsList.get(i).getTrainingPercent());
-	        		}
-	        		else {
-	        			cell01.setCellValue("None");
-	        			cell02.setCellValue("None");
-	        		}
-		        	cell03.setCellValue(this.evaluationsList.get(i).getClassifier());
+
+	        	cell00.setCellValue(this.projName);
+	        	if(this.description.equals("details")) {
+	       			cell01.setCellValue(this.evaluationsList.get(i).getWalkForwardIterationIndex());
+	       			cell02.setCellValue(this.evaluationsList.get(i).getTrainingPercent());
+	       		}
+	       		else {
+	       			cell01.setCellValue("None");
+	       			cell02.setCellValue("None");
+	        	}
+		       	cell03.setCellValue(this.evaluationsList.get(i).getClassifier());
 		        	
-		        	if(this.evaluationsList.get(i).isFeatureSelection()) {
-		        		cell04.setCellValue("Greedy backward search");
-		        	}
-		        	else {
-		        		cell04.setCellValue("None");
-		        	}
-		        	if(this.evaluationsList.get(i).isSampling()) {
-		        		cell05.setCellValue("Undersampling");
-		        	}
-		        	else {
-		        		cell05.setCellValue("None");
-		        	}
-		        	if(this.evaluationsList.get(i).isCostSensitive()) {
-		        		cell06.setCellValue("Sensitive learning");
-		        	}
-		        	else {
-		        		cell06.setCellValue("None");
-		        	}
+		       	if(this.evaluationsList.get(i).isFeatureSelection()) {
+		       		cell04.setCellValue("Greedy backward search");
+		       	}
+	        	else {
+	        		cell04.setCellValue("None");
+	        	}
+		        if(this.evaluationsList.get(i).isSampling()) {
+		       		cell05.setCellValue("Undersampling");
+		       	}
+		       	else {
+		       		cell05.setCellValue("None");
+		       	}
+		       	if(this.evaluationsList.get(i).isCostSensitive()) {
+		       		cell06.setCellValue("Sensitive learning");
+		       	}
+	        	else {
+	        		cell06.setCellValue("None");
+	        	}
 		        	
-		        	cell07.setCellValue(this.evaluationsList.get(i).getPrecision());
-		        	cell08.setCellValue(this.evaluationsList.get(i).getRecall());
-		        	cell09.setCellValue(this.evaluationsList.get(i).getAuc());
-		        	cell10.setCellValue(this.evaluationsList.get(i).getKappa());
-		        	cell11.setCellValue(this.evaluationsList.get(i).getTp());
-		        	cell12.setCellValue(this.evaluationsList.get(i).getFp());
-		        	cell13.setCellValue(this.evaluationsList.get(i).getTn());
-		        	cell14.setCellValue(this.evaluationsList.get(i).getFn());
-	        		
-	        	}	    
+		        cell07.setCellValue(this.evaluationsList.get(i).getPrecision());
+		       	cell08.setCellValue(this.evaluationsList.get(i).getRecall());
+		       	cell09.setCellValue(this.evaluationsList.get(i).getAuc());
+		       	cell10.setCellValue(this.evaluationsList.get(i).getKappa());
+		       	cell11.setCellValue(this.evaluationsList.get(i).getTp());
+		       	cell12.setCellValue(this.evaluationsList.get(i).getFp());
+		       	cell13.setCellValue(this.evaluationsList.get(i).getTn());
+		       	cell14.setCellValue(this.evaluationsList.get(i).getFn());   
 	        	
 	        }	        
 	        wb.write(os);	//Write on file Excel
